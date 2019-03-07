@@ -1,0 +1,13 @@
+mov $r13 0xf;
+mov $r13 0xff;
+mov $r13 0xffff;
+mulu $r1 $r13 0x10;
+muls $r1 $r13 0x10;
+sext $r1 $r13 0x10;
+and $r1 $r13 0x10;
+or $r1 $r13 0x10;
+xor $r1 $r13 0x10;
+xbit $r1 $r13 0x10;
+iord $r13 I[$r13 + 0x4];
+iowr I[$r9] $r15;
+exit;
