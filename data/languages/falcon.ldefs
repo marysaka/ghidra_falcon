@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- See Relax specification: Ghidra/Framework/SoftwareModeling/data/languages/language_definitions.rxg -->
+
+<language_definitions>
+   <language processor="Nvidia Falcon"
+            endian="little"
+            size="32"
+            variant="default"
+            version="1.0"
+            slafile="falcon.sla"
+            processorspec="falcon.pspec"
+            id="falcon:LE:32:default">
+    <description>Nvidia Falcon Language Module</description>
+    <compiler name="default" spec="falcon.cspec" id="default"/>
+  </language> 
+</language_definitions>

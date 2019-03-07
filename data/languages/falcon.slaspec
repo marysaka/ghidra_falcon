@@ -1,0 +1,60 @@
+# Specification for the Nvidia Falcon
+
+define endian=little;
+define alignment=1;
+
+define space ram type=ram_space size=4 default;
+define space register type=register_space size=4;
+
+# gpr
+define register offset=0 size=4 [r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15];
+
+# TODO: define flags?
+define register offset=0x40 size=4 [iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus];
+
+# 8 bits opcode
+define token opcode8 (16)
+  op_size=(6, 8)
+  reg0=(0, 3)
+  reg1=(12, 15)
+  reg2=(8, 11)
+  pred1=(8, 10)
+  fimm8=(8, 15)
+  fimm8s=(8, 15) signed
+;
+
+define token opcode16 (24)
+  imm8=(16, 23)
+  imm8h=(16, 23)
+  imm8s=(16, 23) signed
+  pred2=(16, 18)
+  creg1=(16, 18)
+  creg2=(20, 22)
+  reg3=(20, 23)
+  fimm16=(8, 23)
+  fimm16s=(8, 23) signed
+  strap=(8, 9)
+;
+
+define token opcode24 (32)
+  imm16=(16, 31)
+  imm16w=(16, 31)
+  imm16h=(16, 31)
+  imm16s=(16, 31) signed
+  fimm24=(8, 31)
+  fimm24s=(8, 31) signed
+  cimm2=(20, 25)
+;
+
+define token opcode32 (48)
+  fimm32=(8, 39)
+;
+
+# TODO: define opcode48 (seems used for bra on fuc5)
+
+attach variables [ reg0 reg1 reg2 reg3 ]
+[
+  r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15
+];
+
+# constructor start
