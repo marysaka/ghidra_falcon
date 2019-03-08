@@ -30,4 +30,12 @@ bset $r9 0x10;
 bclr $r9 0x10;
 btgl $r9 0x10;
 //xbit $r9 $flags z
+
+mulu $r1 0x1010;
+muls $r1 0x1010;
+// TODO: sethi
+and $r1 0x1010;
+or $r9 0x1010;
+xor $r9 0x1010;
+
 exit;

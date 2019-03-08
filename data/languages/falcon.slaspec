@@ -147,10 +147,7 @@ define pcodeop exit;
 # 0xEX end
 
 
-# 0xF0 & 0xF1 start
-# FIXME: ellipsis are broken because of limitation at the token level,
-# A way of fixing it would be to define a 16 bits long token containing opcode_len_format & opcode_extra8
-
+# 0xF0 start
 :mulu reg1, imm8 is raw_opcode=0xf0; subopcode2=0x0 & reg1; imm8  {
   # TODO
 }
@@ -188,7 +185,29 @@ define pcodeop exit;
 :btgl reg1, imm8 is raw_opcode=0xf0; subopcode2=0xb & reg1; imm8 {
   # TODO
 }
-# 0xF0 & 0xF1 end
+# 0xF0 end
+
+# 0xF1 start
+:mulu reg1, imm16 is raw_opcode=0xf1; subopcode2=0x0 & reg1; imm16  {
+  # TODO
+}
+
+:muls reg1, imm16s is raw_opcode=0xf1; subopcode2=0x1 & reg1; imm16s {
+  # TODO
+}
+
+:and reg1, imm16 is raw_opcode=0xf1; subopcode2=0x4 & reg1; imm16 {
+  # TODO
+}
+
+:or reg1, imm16 is raw_opcode=0xf1; subopcode2=0x5 & reg1; imm16 {
+  # TODO
+}
+
+:xor reg1, imm16 is raw_opcode=0xf1; subopcode2=0x6 & reg1; imm16 {
+  # TODO
+}
+# 0xF1 end
 
 :exit is raw_opcode=0xf8; subopcode2=0x02 {
   exit();
