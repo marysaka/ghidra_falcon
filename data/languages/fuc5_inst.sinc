@@ -1,0 +1,15 @@
+:mov reg0, fimm8s is raw_opcode_hi=0x00 & reg0; fimm8s {
+  reg0 = fimm8s;
+}
+
+:mov reg0, fimm16s is raw_opcode_hi=0x4 & reg0; fimm16s {
+  reg0 = fimm16s;
+}
+
+:mov reg0, fimm24s is raw_opcode_hi=0x8 & reg0; fimm24s {
+  reg0 = fimm24s;
+}
+
+:mov reg0, fimm32 is raw_opcode_hi=0xd & reg0; fimm32 {
+ reg0 = fimm32;
+}

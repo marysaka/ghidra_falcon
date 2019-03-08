@@ -39,11 +39,17 @@ define token immediate8 (8)
 ;
 
 define token opcode_extra16 (16)
+  imm16=(0, 15)
+  imm16s=(0, 15) signed
   fimm16s=(0, 15) signed
 ;
 
 define token opcode_extra24 (24)
   fimm24s=(0, 23) signed
+;
+
+define token opcode_extra32 (32)
+  fimm32=(0, 31)
 ;
 
 
@@ -59,16 +65,11 @@ define token opcode16 (24)
 ;
 
 define token opcode24 (32)
-  imm16=(16, 31)
   imm16w=(16, 31)
   imm16h=(16, 31)
-  imm16s=(16, 31) signed
+
   fimm24=(8, 31)
   cimm2=(20, 25)
-;
-
-define token opcode32 (48)
-  fimm32=(8, 39)
 ;
 
 # TODO: define opcode48 (seems used for bra on fuc5)
@@ -78,10 +79,11 @@ attach variables [ reg0 reg1 reg2 reg3 ]
   r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15
 ];
 
+@include "fuc5_inst.sinc"
+
 define pcodeop exit;
 
 # constructor start
-
 
 # unsized op start
 
@@ -122,26 +124,73 @@ define pcodeop exit;
 
 # 0xCX end
 
+# 0xEX start
+:mulu reg2, reg1, imm16 is raw_opcode=0xe0; reg2 & reg1; imm16 {
+  # TODO
+}
+
+:muls reg2, reg1, imm16s is raw_opcode=0xe1; reg2 & reg1; imm16s {
+  # TODO
+}
+
+:and reg2, reg1, imm16 is raw_opcode=0xe4; reg2 & reg1; imm16 {
+  # TODO
+}
+
+:or reg2, reg1, imm16 is raw_opcode=0xe5; reg2 & reg1; imm16 {
+  # TODO
+}
+
+:xor reg2, reg1, imm16 is raw_opcode=0xe6; reg2 & reg1; imm16 {
+  # TODO
+}
+# 0xEX end
+
+
+# 0xF0 & 0xF1 start
+# FIXME: ellipsis are broken because of limitation at the token level,
+# A way of fixing it would be to define a 16 bits long token containing opcode_len_format & opcode_extra8
+
+:mulu reg1, imm8 is raw_opcode=0xf0; subopcode2=0x0 & reg1; imm8  {
+  # TODO
+}
+
+:muls reg1, imm8s is raw_opcode=0xf0; subopcode2=0x1 & reg1; imm8s {
+  # TODO
+}
+
+:sext reg1, imm8 is raw_opcode=0xf0; subopcode2=0x2 & reg1; imm8 {
+  # TODO
+}
+
+# TODO: sethi
+
+:and reg1, imm8 is raw_opcode=0xf0; subopcode2=0x4 & reg1; imm8 {
+  # TODO
+}
+
+:or reg1, imm8 is raw_opcode=0xf0; subopcode2=0x5 & reg1; imm8 {
+  # TODO
+}
+
+:xor reg1, imm8 is raw_opcode=0xf0; subopcode2=0x6 & reg1; imm8 {
+  # TODO
+}
+
+:bset reg1, imm8 is raw_opcode=0xf0; subopcode2=0x9 & reg1; imm8 {
+  # TODO
+}
+
+:bclr reg1, imm8 is raw_opcode=0xf0; subopcode2=0xa & reg1; imm8 {
+  # TODO
+}
+
+:btgl reg1, imm8 is raw_opcode=0xf0; subopcode2=0xb & reg1; imm8 {
+  # TODO
+}
+# 0xF0 & 0xF1 end
+
 :exit is raw_opcode=0xf8; subopcode2=0x02 {
   exit();
 }
 # unsized op end
-
-# 3 bytes op start
-:mov reg0, fimm8s is raw_opcode_hi=0x00 & reg0; fimm8s {
-  reg0 = fimm8s;
-}
-# 3 bytes op end
-
-# 4 bytes op start
-:mov reg0, fimm16s is raw_opcode_hi=0x4 & reg0; fimm16s {
-  reg0 = fimm16s;
-}
-# 4 bytes op end
-
-
-# 5 bytes op start
-:mov reg0, fimm24s is raw_opcode_hi=0x8 & reg0; fimm24s {
-  reg0 = fimm24s;
-}
-# 5 bytes op end
