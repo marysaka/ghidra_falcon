@@ -24,13 +24,23 @@ macro xor(dst, src1, src2) {
   setResultFlags(dst);
 }
 
+# TODO: check if that set flags on hardware
+macro mulu(dst, src1, src2) {
+  dst = zext(src1) * zext(src2);
+}
+
+# TODO: check if that set flags on hardware
+macro muls(dst, src1, src2) {
+  dst = sext(src1) * sext(src2);
+}
+
 # 0xCX start
 :mulu reg2, reg1, imm8 is raw_opcode=0xc0; reg2 & reg1; imm8 {
-  # TODO
+  mulu(reg2:4, reg1:4, imm8:4);
 }
 
 :muls reg2, reg1, imm8s is raw_opcode=0xc1; reg2 & reg1; imm8s {
-  # TODO
+  muls(reg2:4, reg1:4, imm8s:4);
 }
 
 :sext reg2, reg1, imm8 is raw_opcode=0xc2; reg2 & reg1; imm8 {
@@ -55,11 +65,11 @@ macro xor(dst, src1, src2) {
 
 # 0xEX start
 :mulu reg2, reg1, imm16 is raw_opcode=0xe0; reg2 & reg1; imm16 {
-  # TODO
+  mulu(reg2:4, reg1:4, imm16:4);
 }
 
 :muls reg2, reg1, imm16s is raw_opcode=0xe1; reg2 & reg1; imm16s {
-  # TODO
+  muls(reg2:4, reg1:4, imm16s:4);
 }
 
 :and reg2, reg1, imm16 is raw_opcode=0xe4; reg2 & reg1; imm16 { and(reg2, reg1, imm16); }
@@ -70,11 +80,11 @@ macro xor(dst, src1, src2) {
 
 # 0xF0 start
 :mulu reg1, imm8 is raw_opcode=0xf0; subopcode2=0x0 & reg1; imm8  {
-  # TODO
+  mulu(reg1:4, reg1:4, imm8:4);
 }
 
 :muls reg1, imm8s is raw_opcode=0xf0; subopcode2=0x1 & reg1; imm8s {
-  # TODO
+  muls(reg1:4, reg1:4, imm8s:4);
 }
 
 :sext reg1, imm8 is raw_opcode=0xf0; subopcode2=0x2 & reg1; imm8 {
@@ -105,11 +115,11 @@ macro xor(dst, src1, src2) {
 
 # 0xF1 start
 :mulu reg1, imm16 is raw_opcode=0xf1; subopcode2=0x0 & reg1; imm16  {
-  # TODO
+  mulu(reg1:4, reg1:4, imm16:4);
 }
 
 :muls reg1, imm16s is raw_opcode=0xf1; subopcode2=0x1 & reg1; imm16s {
-  # TODO
+  muls(reg1:4, reg1:4, imm16s:4);
 }
 
 :and reg1, imm16 is raw_opcode=0xf1; subopcode2=0x4 & reg1; imm16 { and(reg1, reg1, imm16); }
