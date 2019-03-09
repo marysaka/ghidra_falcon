@@ -1,5 +1,29 @@
 define pcodeop exit;
 
+macro and(dst, src1, src2) {
+  dst = src1 & src2;
+
+  $(C_flag) = 0;
+  $(O_flag) = 0;
+  setResultFlags(dst);
+}
+
+macro or(dst, src1, src2) {
+  dst = src1 | src2;
+
+  $(C_flag) = 0;
+  $(O_flag) = 0;
+  setResultFlags(dst);
+}
+
+macro xor(dst, src1, src2) {
+  dst = src1 ^ src2;
+
+  $(C_flag) = 0;
+  $(O_flag) = 0;
+  setResultFlags(dst);
+}
+
 # 0xCX start
 :mulu reg2, reg1, imm8 is raw_opcode=0xc0; reg2 & reg1; imm8 {
   # TODO
@@ -13,29 +37,9 @@ define pcodeop exit;
   # TODO
 }
 
-:and reg2, reg1, imm8 is raw_opcode=0xc4; reg2 & reg1; imm8 {
-  reg2 = reg1 & imm8;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg2);
-}
-
-:or reg2, reg1, imm8 is raw_opcode=0xc5; reg2 & reg1; imm8 {
-  reg2 = reg1 | imm8;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg2);
-}
-
-:xor reg2, reg1, imm8 is raw_opcode=0xc6; reg2 & reg1; imm8 {
-  reg2 = reg1 ^ imm8;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg2);
-}
+:and reg2, reg1, imm8 is raw_opcode=0xc4; reg2 & reg1; imm8 { and(reg2, reg1, imm8); }
+:or  reg2, reg1, imm8 is raw_opcode=0xc5; reg2 & reg1; imm8 { or(reg2, reg1, imm8); }
+:xor reg2, reg1, imm8 is raw_opcode=0xc6; reg2 & reg1; imm8 { xor(reg2, reg1, imm8); }
 
 :xbit reg2, reg1, imm8 is raw_opcode=0xc8; reg2 & reg1; imm8 {
   # TODO
@@ -58,29 +62,9 @@ define pcodeop exit;
   # TODO
 }
 
-:and reg2, reg1, imm16 is raw_opcode=0xe4; reg2 & reg1; imm16 {
-  reg2 = reg1 & imm16;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg2);
-}
-
-:or reg2, reg1, imm16 is raw_opcode=0xe5; reg2 & reg1; imm16 {
-  reg2 = reg1 | imm16;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg2);
-}
-
-:xor reg2, reg1, imm16 is raw_opcode=0xe6; reg2 & reg1; imm16 {
-  reg2 = reg1 ^ imm16;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg2);
-}
+:and reg2, reg1, imm16 is raw_opcode=0xe4; reg2 & reg1; imm16 { and(reg2, reg1, imm16); }
+:or  reg2, reg1, imm16 is raw_opcode=0xe5; reg2 & reg1; imm16 { or(reg2, reg1, imm16); }
+:xor reg2, reg1, imm16 is raw_opcode=0xe6; reg2 & reg1; imm16 { xor(reg2, reg1, imm16); }
 # 0xEX end
 
 
@@ -99,29 +83,9 @@ define pcodeop exit;
 
 # TODO: sethi
 
-:and reg1, imm8 is raw_opcode=0xf0; subopcode2=0x4 & reg1; imm8 {
-  reg1 = reg1 & imm8;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg1);
-}
-
-:or reg1, imm8 is raw_opcode=0xf0; subopcode2=0x5 & reg1; imm8 {
-  reg1 = reg1 | imm8;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg1);
-}
-
-:xor reg1, imm8 is raw_opcode=0xf0; subopcode2=0x6 & reg1; imm8 {
-  reg1 = reg1 ^ imm8;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg1);
-}
+:and reg1, imm8 is raw_opcode=0xf0; subopcode2=0x4 & reg1; imm8 { and(reg1, reg1, imm8); }
+:or  reg1, imm8 is raw_opcode=0xf0; subopcode2=0x5 & reg1; imm8 { or(reg1, reg1, imm8); }
+:xor reg1, imm8 is raw_opcode=0xf0; subopcode2=0x6 & reg1; imm8 { xor(reg1, reg1, imm8); }
 
 :bset reg1, imm8 is raw_opcode=0xf0; subopcode2=0x9 & reg1; imm8 {
   # TODO
@@ -148,29 +112,9 @@ define pcodeop exit;
   # TODO
 }
 
-:and reg1, imm16 is raw_opcode=0xf1; subopcode2=0x4 & reg1; imm16 {
-  reg1 = reg1 & imm16;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg1);
-}
-
-:or reg1, imm16 is raw_opcode=0xf1; subopcode2=0x5 & reg1; imm16 {
-  reg1 = reg1 | imm16;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg1);
-}
-
-:xor reg1, imm16 is raw_opcode=0xf1; subopcode2=0x6 & reg1; imm16 {
-  reg1 = reg1 ^ imm16;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(reg1);
-}
+:and reg1, imm16 is raw_opcode=0xf1; subopcode2=0x4 & reg1; imm16 { and(reg1, reg1, imm16); }
+:or  reg1, imm16 is raw_opcode=0xf1; subopcode2=0x5 & reg1; imm16 { or(reg1, reg1, imm16); }
+:xor reg1, imm16 is raw_opcode=0xf1; subopcode2=0x6 & reg1; imm16 { xor(reg1, reg1, imm16); }
 # 0xF1 end
 
 :call fimm16 is raw_opcode=0xf3; fimm16 {

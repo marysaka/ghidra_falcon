@@ -42,7 +42,7 @@
         </pentry>
       </output>
       <unaffected>
-          <register name="r1"/>
+        <register name="r1"/>
       </unaffected>
     </prototype>
   </default_proto>
