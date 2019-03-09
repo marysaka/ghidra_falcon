@@ -4,4 +4,7 @@
 
 <processor_spec>
   <programcounter register="pc"/>
+  <register_data>
+    <register name="flags" group="Flags"/>
+  </register_data>
 </processor_spec>

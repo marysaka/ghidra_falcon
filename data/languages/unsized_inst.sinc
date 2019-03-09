@@ -131,6 +131,58 @@ define pcodeop exit;
 
 # TODO: setp (0x8f2)
 
+
+### Branch instructions start ###
+
+rel8: target is imm8s [ target = inst_start + imm8s; ] {
+  export *:4 target;
+}
+
+rel16: target is imm16s [ target = inst_start + imm16s; ] {
+  export *:4 target;
+}
+
+### Start bra conditional ###
+bra_cc: "p0"             is subopcodeL=0x00                              { c:1 = ($(P0_flag) == 1); export c; }
+bra_cc: "p1"             is subopcodeL=0x01                              { c:1 = ($(P1_flag) == 1); export c; }
+bra_cc: "p2"             is subopcodeL=0x02                              { c:1 = ($(P2_flag) == 1); export c; }
+bra_cc: "p3"             is subopcodeL=0x03                              { c:1 = ($(P3_flag) == 1); export c; }
+bra_cc: "p4"             is subopcodeL=0x04                              { c:1 = ($(P4_flag) == 1); export c; }
+bra_cc: "p5"             is subopcodeL=0x05                              { c:1 = ($(P5_flag) == 1); export c; }
+bra_cc: "p6"             is subopcodeL=0x06                              { c:1 = ($(P6_flag) == 1); export c; }
+bra_cc: "p7"             is subopcodeL=0x07                              { c:1 = ($(P7_flag) == 1); export c; }
+bra_cc: "c"              is subopcodeL=0x08                              { c:1 = ($(C_flag) == 1); export c; }
+bra_cc: "o"              is subopcodeL=0x09                              { c:1 = ($(O_flag) == 1); export c; }
+bra_cc: "s"              is subopcodeL=0x0a                              { c:1 = ($(S_flag) == 1); export c; }
+bra_cc: "z"              is subopcodeL=0x0b                              { c:1 = ($(Z_flag) == 1); export c; }
+bra_cc: "a"              is subopcodeL=0x0c                              { c:1 = ($(C_flag) == 1) & ($(Z_flag) == 0); export c; }
+bra_cc: "na"             is subopcodeL=0x0d                              { c:1 = ($(C_flag) == 1) | ($(Z_flag) == 1); export c; }
+bra_cc:                  is subopcodeL=0x0e                              { c:1 = 1; export c; }
+bra_cc: "not p0"         is subopcodeL=0x10                              { c:1 = ($(P0_flag) == 0); export c; }
+bra_cc: "not p1"         is subopcodeL=0x11                              { c:1 = ($(P1_flag) == 0); export c; }
+bra_cc: "not p2"         is subopcodeL=0x12                              { c:1 = ($(P2_flag) == 0); export c; }
+bra_cc: "not p3"         is subopcodeL=0x13                              { c:1 = ($(P3_flag) == 0); export c; }
+bra_cc: "not p4"         is subopcodeL=0x14                              { c:1 = ($(P4_flag) == 0); export c; }
+bra_cc: "not p5"         is subopcodeL=0x15                              { c:1 = ($(P5_flag) == 0); export c; }
+bra_cc: "not p6"         is subopcodeL=0x16                              { c:1 = ($(P6_flag) == 0); export c; }
+bra_cc: "not p7"         is subopcodeL=0x17                              { c:1 = ($(P7_flag) == 0); export c; }
+bra_cc: "nc"             is subopcodeL=0x18                              { c:1 = ($(C_flag) == 0); export c; }
+bra_cc: "no"             is subopcodeL=0x19                              { c:1 = ($(O_flag) == 0); export c; }
+bra_cc: "ns"             is subopcodeL=0x1a                              { c:1 = ($(S_flag) == 0); export c; }
+bra_cc: "nz"             is subopcodeL=0x1b                              { c:1 = ($(Z_flag) == 0); export c; }
+# TODO: FUC3 (g, le, l, ge)
+### End bra conditional ###
+
+:bra bra_cc rel8 is raw_opcode=0xf4; subopcodeL < 0x20 & bra_cc; rel8 {
+  if (bra_cc) goto rel8;
+}
+
+:bra bra_cc rel16 is raw_opcode=0xf5; subopcodeL < 0x20 & bra_cc; rel16 {
+  if (bra_cc) goto rel16;
+}
+### Branch instructions end ###
+
+
 :exit is raw_opcode=0xf8; subopcode2=0x02 {
   exit();
 }

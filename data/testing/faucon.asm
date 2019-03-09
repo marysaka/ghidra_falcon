@@ -29,7 +29,6 @@ xor $r9 0x10;
 bset $r9 0x10;
 bclr $r9 0x10;
 btgl $r9 0x10;
-//xbit $r9 $flags z
 
 mulu $r1 0x1010;
 muls $r1 0x1010;
@@ -37,5 +36,6 @@ muls $r1 0x1010;
 and $r1 0x1010;
 or $r9 0x1010;
 xor $r9 0x1010;
-
+bra c 0x0;
+bra nc 0x1000;
 exit;
