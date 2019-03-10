@@ -1,3 +1,5 @@
+mov $r13 0x1000;
+mov $sp $r13;
 mov $r13 0xf;
 mov $r13 0xff;
 mov $r13 0xffff;
@@ -36,5 +38,8 @@ muls $r1 0x1010;
 and $r1 0x1010;
 or $r9 0x1010;
 xor $r9 0x1010;
-bra 0x0;
-exit;
+call 0x77
+bra 0x6;
+ret;
+mov $r10 0x42
+ret;

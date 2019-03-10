@@ -127,14 +127,20 @@ macro muls(dst, src1, src2) {
 :xor reg1, imm16 is raw_opcode=0xf1; subopcode2=0x6 & reg1; imm16 { xor(reg1, reg1, imm16); }
 # 0xF1 end
 
-:call fimm16 is raw_opcode=0xf3; fimm16 {
-    # TODO
-}
-
 # TODO: setp (0x8f2)
 
 
 ### Branch instructions start ###
+
+macro push32(val32) {
+  sp = sp - 4;
+  *:4 sp = val32;
+}
+
+macro pop32(ret32) {
+  sp = sp + 4;
+  ret32 = *:4 sp;
+}
 
 rel8: target is imm8s [ target = inst_start + imm8s; ] {
   export *:4 target;
@@ -142,6 +148,10 @@ rel8: target is imm8s [ target = inst_start + imm8s; ] {
 
 rel16: target is imm16s [ target = inst_start + imm16s; ] {
   export *:4 target;
+}
+
+addr16: imm16 is imm16 {
+  export *:4 imm16;
 }
 
 ### Start bra conditional ###
@@ -182,9 +192,27 @@ bra_cc: "nz"             is subopcodeL=0x1b                              { c:1 =
 :bra bra_cc rel16 is raw_opcode=0xf5; subopcodeL < 0x20 & bra_cc; rel16 {
   if (bra_cc) goto rel16;
 }
+
+:call addr16 is raw_opcode=0xf3; addr16 {
+  push32(&:4 inst_next);
+  call addr16;
+}
+
+:ret is raw_opcode=0xf8; subopcode2=0x00 {
+  pop32(pc);
+  return [pc];
+}
+
 ### Branch instructions end ###
 
 
 :exit is raw_opcode=0xf8; subopcode2=0x02 {
   exit();
+}
+
+
+# 0xFE
+
+:mov sreg2, reg1 is raw_opcode=0xfe; reg1 & sreg2; subopcode3=0x0 {
+  sreg2 = reg1;
 }
