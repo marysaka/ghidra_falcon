@@ -1,34 +1,5 @@
 define pcodeop exit;
 
-macro and(dst, src1, src2) {
-  dst = src1 & src2;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(dst);
-}
-
-macro or(dst, src1, src2) {
-  dst = src1 | src2;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(dst);
-}
-
-macro xor(dst, src1, src2) {
-  dst = src1 ^ src2;
-
-  $(C_flag) = 0;
-  $(O_flag) = 0;
-  setResultFlags(dst);
-}
-
-# TODO: check if that set flags on hardware
-macro mulu(dst, src1, src2) {
-  dst = zext(src1) * zext(src2);
-}
-
 # TODO: check if that set flags on hardware
 macro muls(dst, src1, src2) {
   dst = sext(src1) * sext(src2);
@@ -129,30 +100,7 @@ macro muls(dst, src1, src2) {
 
 # TODO: setp (0x8f2)
 
-
 ### Branch instructions start ###
-
-macro push32(val32) {
-  sp = sp - 4;
-  *:4 sp = val32;
-}
-
-macro pop32(ret32) {
-  sp = sp + 4;
-  ret32 = *:4 sp;
-}
-
-rel8: target is imm8s [ target = inst_start + imm8s; ] {
-  export *:4 target;
-}
-
-rel16: target is imm16s [ target = inst_start + imm16s; ] {
-  export *:4 target;
-}
-
-addr16: imm16 is imm16 {
-  export *:4 imm16;
-}
 
 ### Start bra conditional ###
 bra_cc: "p0"             is subopcodeL=0x00                              { c:1 = ($(P0_flag) == 1); export c; }
@@ -193,11 +141,6 @@ bra_cc: "nz"             is subopcodeL=0x1b                              { c:1 =
   if (bra_cc) goto rel16;
 }
 
-:call addr16 is raw_opcode=0xf3; addr16 {
-  push32(&:4 inst_next);
-  call addr16;
-}
-
 :ret is raw_opcode=0xf8; subopcode2=0x00 {
   pop32(pc);
   return [pc];
@@ -210,9 +153,7 @@ bra_cc: "nz"             is subopcodeL=0x1b                              { c:1 =
   exit();
 }
 
-
 # 0xFE
-
 :mov sreg2, reg1 is raw_opcode=0xfe; reg1 & sreg2; subopcode3=0x0 {
   sreg2 = reg1;
 }

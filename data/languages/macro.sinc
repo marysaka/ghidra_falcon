@@ -1,0 +1,43 @@
+macro push32(val32) {
+  sp = sp - 4;
+  *:4 sp = val32;
+}
+
+macro pop32(ret32) {
+  sp = sp + 4;
+  ret32 = *:4 sp;
+}
+
+macro setResultFlags(result) {
+  $(Z_flag) = (result == 0);
+  $(S_flag) = (result s< 0);
+}
+
+macro and(dst, src1, src2) {
+  dst = src1 & src2;
+
+  $(C_flag) = 0;
+  $(O_flag) = 0;
+  setResultFlags(dst);
+}
+
+macro or(dst, src1, src2) {
+  dst = src1 | src2;
+
+  $(C_flag) = 0;
+  $(O_flag) = 0;
+  setResultFlags(dst);
+}
+
+macro xor(dst, src1, src2) {
+  dst = src1 ^ src2;
+
+  $(C_flag) = 0;
+  $(O_flag) = 0;
+  setResultFlags(dst);
+}
+
+# TODO: check if that set flags on hardware
+macro mulu(dst, src1, src2) {
+  dst = zext(src1) * zext(src2);
+}

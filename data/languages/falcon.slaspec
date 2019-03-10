@@ -103,15 +103,22 @@ attach variables [ sreg2 ]
   iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus _ _ _
 ];
 
-macro setResultFlags(result) {
-  $(Z_flag) = (result == 0);
-  $(S_flag) = (result s< 0);
+rel8: target is imm8s [ target = inst_start + imm8s; ] {
+  export *:4 target;
 }
 
-define pcodeop segment; # Define special pcodeop that calculates the RAM address
+rel16: target is imm16s [ target = inst_start + imm16s; ] {
+  export *:4 target;
+}
+
+addr16: imm16 is imm16 {
+  export *:4 imm16;
+}
+
+@include "macro.sinc"
+@include "unsized_inst.sinc"
 
 @include "fuc5_inst.sinc"
 @include "crypt_inst.sinc"
-@include "unsized_inst.sinc"
 
 # constructor start
