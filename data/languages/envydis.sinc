@@ -309,7 +309,8 @@
   # TODO
 }
 #	{ 0xbc000000, 0xfc000000, N("cprecmac"), CREG1, CREG2 }, /* shift left by 1. if bit shifted out the left side was set, xor with 0x87. */
-:cprecmac creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xbc >> 2) {
+# @hthh if you do anything, rename cprecmac to cgfmul
+:cgfmul creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xbc >> 2) {
   # TODO
 }
 #	/* Load selected secret to register. The register is subsequently
