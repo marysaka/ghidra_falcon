@@ -50,6 +50,7 @@
       </output>
       <unaffected>
         <register name="r1"/>
+        <register name="sp"/>
       </unaffected>
       <localrange>
         <range space="stack"/>

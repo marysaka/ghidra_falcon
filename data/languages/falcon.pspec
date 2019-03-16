@@ -4,7 +4,15 @@
 
 <processor_spec>
   <programcounter register="pc"/>
+
+  <volatile outputop="cWrite" inputop="cRead">
+    <!--<range space="register" first="0x40" last="0x5b"/>-->
+    <range space="register" first="0x64" last="0xff"/>
+  </volatile>
   <register_data>
-    <register name="flags" group="Flags"/>
+    <register name="AF_" group="Alt"/>
+    <register name="BC_" group="Alt"/>
+    <register name="DE_" group="Alt"/>
+    <register name="HL_" group="Alt"/>
   </register_data>
 </processor_spec>

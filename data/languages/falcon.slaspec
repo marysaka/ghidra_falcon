@@ -7,10 +7,20 @@ define space ram type=ram_space size=4 default;
 define space register type=register_space size=4;
 
 # gpr
-define register offset=0 size=4 [r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15];
+define register offset=0 size=4 [
+
+  r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15
+
+  # offset = 0x40
+  iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus 
+
+  # offset = 0x80
+  # TODO: what size are these really?
+  c0 c1 c2 c3 c4 c5 c6 c7
+];
 
 # TODO: define flags?
-define register offset=0x40 size=4 [iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus];
+#define register offset=0x40 size=4 [iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus];
 
 @define P0_flag "flags[0, 1]"
 @define P1_flag "flags[1, 1]"
@@ -41,13 +51,39 @@ define token opcode_byte1 (8)
   reg2=(0, 3)
   sreg2=(0, 3)
   reg1=(4, 7)
+  sreg1=(4, 7)
   subopcode2=(0, 3)
+  subopcodeb1_0_2=(0, 2)
+  subopcodeb1_0_5=(0, 5)
+  subopcodeb1_0_7=(0, 7)
   subopcodeL=(0, 6)
   pred1=(0, 2)
 ;
 
 define token opcode_byte2 (8)
   subopcode3=(0, 3)
+  reg3=(4, 7)
+
+  bitf8_0=(0,4)
+  bitf8_1=(5,7)
+
+  #creg1=(0, 2)
+  #creg2=(4, 6)
+;
+
+
+define token opcode_byte4 (8)
+  subopcode5=(0, 3)
+
+  crypt_extra=(0, 1)
+  #subopcode_crypt=(2, 7)
+;
+
+define token crypt_pair (16)
+  creg1=(0, 2)
+  creg2=(4, 6)
+  cimm2=(4, 9)
+  subopcode_crypt=(10,15)
 ;
 
 define token immediate8 (8)
@@ -66,6 +102,7 @@ define token opcode_immediate16 (16)
 
 define token opcode_immediate24 (24)
   fimm24s=(0, 23) signed
+  fimm24=(0, 24)
 ;
 
 define token opcode_immediate32 (32)
@@ -73,23 +110,23 @@ define token opcode_immediate32 (32)
 ;
 
 
-# FIXME: this is wrong, redefine every opcode* tokens
-define token opcode16 (24)
-  imm8h=(16, 23)
-  pred2=(16, 18)
-  creg1=(16, 18)
-  creg2=(20, 22)
-  reg3=(20, 23)
-  strap=(8, 9)
-;
-
-define token opcode24 (32)
-  imm16w=(16, 31)
-  imm16h=(16, 31)
-
-  fimm24=(8, 31)
-  cimm2=(20, 25)
-;
+## FIXME: this is wrong, redefine every opcode* tokens
+#define token opcode16 (24)
+#  imm8h=(16, 23)
+#  pred2=(16, 18)
+#  creg1=(16, 18)
+#  creg2=(20, 22)
+#  reg3=(20, 23)
+#  strap=(8, 9)
+#;
+#
+#define token opcode24 (32)
+#  imm16w=(16, 31)
+#  imm16h=(16, 31)
+#
+#  fimm24=(8, 31)
+#  cimm2=(20, 25)
+#;
 
 # TODO: define opcode48 (seems used for bra on fuc5)
 
@@ -98,9 +135,15 @@ attach variables [ reg0 reg1 reg2 reg3 ]
   r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15
 ];
 
-attach variables [ sreg2 ]
+attach variables [ sreg1 sreg2 ]
 [
   iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus _ _ _
+];
+
+
+attach variables [ creg1 creg2 ]
+[
+  c0 c1 c2 c3 c4 c5 c6 c7
 ];
 
 rel8: target is imm8s [ target = inst_start + imm8s; ] {
@@ -120,5 +163,7 @@ addr16: imm16 is imm16 {
 
 @include "fuc5_inst.sinc"
 @include "crypt_inst.sinc"
+
+@include "envydis.sinc"
 
 # constructor start
