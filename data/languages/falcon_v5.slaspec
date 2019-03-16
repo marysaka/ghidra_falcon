@@ -1,0 +1,9 @@
+@define FUC_VERSION "5"
+
+@define SUPPORT_FUC3P
+@define SUPPORT_FUC4P
+@define SUPPORT_FUC5P
+
+@define CRYPT_EXTENSION
+
+@include "base_falcon.slaspec"

@@ -1,4 +1,4 @@
-# Specification for the Nvidia Falcon
+# Base specification for the Nvidia Falcon
 
 define endian=little;
 define alignment=1;
@@ -140,8 +140,15 @@ addr16: imm16 is imm16 {
 @include "macro.sinc"
 @include "unsized_inst.sinc"
 
+@if defined(SUPPORT_FUC5P)
 @include "fuc5_inst.sinc"
+@endif
+
+
+@if defined(CRYPT_EXTENSION)
 @include "crypt_inst.sinc"
+@endif
+
 
 @include "envydis.sinc"
 

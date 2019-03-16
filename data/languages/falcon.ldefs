@@ -3,15 +3,72 @@
 <!-- See Relax specification: Ghidra/Framework/SoftwareModeling/data/languages/language_definitions.rxg -->
 
 <language_definitions>
-   <language processor="Nvidia Falcon"
+  <!-->
+   <language processor="Falcon"
             endian="little"
             size="32"
-            variant="default"
+            variant="v0"
             version="1.0"
             slafile="falcon.sla"
-            processorspec="falcon.pspec"
-            id="falcon:LE:32:default">
-    <description>Nvidia Falcon Language Module</description>
+            processorspec="falcon_v0.pspec"
+            id="falcon:LE:32:v0">
+    <description>Nvidia Falcon v0</description>
     <compiler name="default" spec="falcon.cspec" id="default"/>
-  </language> 
+  </language>
+   <language processor="Falcon"
+            endian="little"
+            size="32"
+            variant="v1"
+            version="1.0"
+            slafile="falcon.sla"
+            processorspec="falcon_v1.pspec"
+            id="falcon:LE:32:v1">
+    <description>Nvidia Falcon v1</description>
+    <compiler name="default" spec="falcon.cspec" id="default"/>
+  </language>
+   <language processor="Falcon"
+            endian="little"
+            size="32"
+            variant="v2"
+            version="1.0"
+            slafile="falcon.sla"
+            processorspec="falcon_v2.pspec"
+            id="falcon:LE:32:v2">
+    <description>Nvidia Falcon v2</description>
+    <compiler name="default" spec="falcon.cspec" id="default"/>
+  </language>
+   <language processor="Falcon"
+            endian="little"
+            size="32"
+            variant="v3"
+            version="1.0"
+            slafile="falcon.sla"
+            processorspec="falcon_v3.pspec"
+            id="falcon:LE:32:v3">
+    <description>Nvidia Falcon v3</description>
+    <compiler name="default" spec="falcon.cspec" id="default"/>
+  </language>
+   <language processor="Falcon"
+            endian="little"
+            size="32"
+            variant="v4"
+            version="1.0"
+            slafile="falcon.sla"
+            processorspec="falcon_v4.pspec"
+            id="falcon:LE:32:v4">
+    <description>Nvidia Falcon v4</description>
+    <compiler name="default" spec="falcon.cspec" id="default"/>
+  </language>
+  <!-->
+   <language processor="Falcon"
+            endian="little"
+            size="32"
+            variant="v5"
+            version="1.0"
+            slafile="falcon_v5.sla"
+            processorspec="falcon.pspec"
+            id="falcon:LE:32:v5">
+    <description>Nvidia Falcon v5</description>
+    <compiler name="default" spec="falcon.cspec" id="default"/>
+  </language>
 </language_definitions>
