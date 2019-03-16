@@ -10,9 +10,5 @@
     <range space="register" first="0x64" last="0xff"/>
   </volatile>
   <register_data>
-    <register name="AF_" group="Alt"/>
-    <register name="BC_" group="Alt"/>
-    <register name="DE_" group="Alt"/>
-    <register name="HL_" group="Alt"/>
   </register_data>
 </processor_spec>

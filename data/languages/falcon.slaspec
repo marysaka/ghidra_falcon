@@ -108,25 +108,6 @@ define token opcode_immediate32 (32)
   fimm32=(0, 31)
 ;
 
-
-## FIXME: this is wrong, redefine every opcode* tokens
-#define token opcode16 (24)
-#  imm8h=(16, 23)
-#  pred2=(16, 18)
-#  creg1=(16, 18)
-#  creg2=(20, 22)
-#  reg3=(20, 23)
-#  strap=(8, 9)
-#;
-#
-#define token opcode24 (32)
-#  imm16w=(16, 31)
-#  imm16h=(16, 31)
-#
-#  fimm24=(8, 31)
-#  cimm2=(20, 25)
-#;
-
 # TODO: define opcode48 (seems used for bra on fuc5)
 
 attach variables [ reg0 reg1 reg2 reg3 ]
