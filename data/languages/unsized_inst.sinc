@@ -77,7 +77,14 @@ bra_cc: "nc"             is subopcodeL=0x18                              { c:1 =
 bra_cc: "no"             is subopcodeL=0x19                              { c:1 = ($(O_flag) == 0); export c; }
 bra_cc: "ns"             is subopcodeL=0x1a                              { c:1 = ($(S_flag) == 0); export c; }
 bra_cc: "nz"             is subopcodeL=0x1b                              { c:1 = ($(Z_flag) == 0); export c; }
-# TODO: FUC3 (g, le, l, ge)
+bra_cc: "g"              is subopcodeL=0x1c                              { c:1 = (($(O_flag) ^ $(S_flag)) == 0) & ($(Z_flag) == 0); export c; }
+
+@if defined(SUPPORT_FUC3P)
+bra_cc: "le"             is subopcodeL=0x1d                              { c:1 = (($(O_flag) ^ $(S_flag)) == 1) | ($(Z_flag) == 1); export c; }
+bra_cc: "l"              is subopcodeL=0x1e                              { c:1 = (($(O_flag) ^ $(S_flag)) == 1); export c; }
+bra_cc: "ge"             is subopcodeL=0x1f                              { c:1 = (($(O_flag) ^ $(S_flag)) == 0); export c; }
+@endif
+
 ### End bra conditional ###
 
 :bra bra_cc rel8 is raw_opcode=0xf4; subopcodeL < 0x20 & bra_cc; rel8 {
