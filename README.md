@@ -24,7 +24,16 @@ In Ghidra open the script manager ("Window" -> "Script Manager") and add key-bin
 
 `ReloadSleighLangauge.java` will reload most changes to the slaspec, including new instructions and new semantic definitions. However, if you add new registers or new `define pcodeop ...` statements, you will need to restart Ghidra to get correct output.
 
-At the moment any particularly poorly implemented instruction should show up as a call to the `todo` pcodeop in the decompiler output - this is a hint that the instruction should be implemented for correct disassembly. Get the line number using `DebugSleighInstructionParse.java` on the corresponding instruction, and add the implementation to the slaspec/sinc file.
+### Adding instructions to the decompiler
+
+At the moment any particularly poorly implemented instruction should show up as a call to the `todo` pcodeop in the decompiler output - this is a hint that the instruction should be implemented for correct decompilation. Get the line number using `DebugSleighInstructionParse.java` on the corresponding instruction, and add the implementation to the slaspec/sinc file.
+
+See Ghidra's `doc/languages/index.html` for more information about how to describe instructions.
+
+Run `ReloadSleighLangauge.java`, or, if you've added a new pcodeop for the instruction, close and re-open Ghidra to see the new output.
+
+
+### Adding instructions to the disassembler
 
 If you hit undecodable instruction bytes, find the correct decoding in your `envydis` output, then search through the `envydis.sinc` file for the envydis source comment that matches. For example:
 
@@ -53,7 +62,16 @@ Reload (with your `ReloadSleighLangauge.java` hotkey), disassembly the bytes (by
 
 If you hit errors reloading, you can view the log by clicking the "Show Console" icon at the bottom Ghidra project window (the one with the file listing, not the CodeBrowser/disassembly window). The errors are only helpful some of the time, so I usually check my changes by hand first to see if I can spot what I did wrong.
 
-(Personally I've avoided pre-emptively adding operations that I can't test/verify easily, because I'm sure I'd even more mistakes and not realise I hadn't verified things. It should be practical to generate a huge test file covering every instruction encoding with different operand values, and automatically compare the Ghidra and envydis output to finish the instruction decoding.)
+## To-Do
+
+Personally I've avoided pre-emptively adding operations that I can't test/verify easily, because I'm sure I'd even more mistakes and not realise I hadn't verified things. It should be practical to generate a huge test file covering every instruction encoding with different operand values, and automatically compare the Ghidra and envydis output to finish the instruction decoding.
+
+Known issues:
+
+* crypto coprocessor stuff is incorrect and messy
+* separate the address spaces - this is causing weird problems
+* fix mpush/mpop implementation (and variants)
+* get arguments passed on the stack tested and working
 
 ## Resources
 
