@@ -2,6 +2,8 @@
 
 This is pretty immature, so you'll probably need to do some development to use it, but it's likely good enough to save a bit of time over an `envydis` dead-listing.
 
+![Screenshot](/images/screenshot1.png)
+
 ## (TODO) Setup instructions
 
 I just created a new Ghidra plugin in Eclipse and replaced the files with the files from this repo, but I'm sure there's a better way (?)
