@@ -18,7 +18,7 @@ define pcodeop csigenc_todo;
 define pcodeop csecret_todo;
 define pcodeop ckexp_todo;
 define pcodeop ckrexp_todo;
-define pcodeop cprecmac_todo;
+define pcodeop cgfmul_todo;
 define pcodeop crev_todo;
 define pcodeop cs0begin;
 define pcodeop cs0exec;
