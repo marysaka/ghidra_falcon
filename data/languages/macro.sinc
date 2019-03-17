@@ -1,8 +1,14 @@
 macro store32(addr, value) {
   *:4 (addr) = value;
 }
+macro store8(addr, value) {
+  *:1 (addr) = value;
+}
 macro load32(dst1, addr) {
   dst1 = *:4 (addr);
+}
+macro load8(dst1, addr) {
+  dst1 = *:1 (addr);
 }
 
 macro xbit(dst1, src1, bit1) {
