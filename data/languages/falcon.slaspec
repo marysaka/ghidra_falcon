@@ -66,9 +66,6 @@ define token opcode_byte2 (8)
 
   bitf8_0=(0,4)
   bitf8_1=(5,7)
-
-  #creg1=(0, 2)
-  #creg2=(4, 6)
 ;
 
 
@@ -83,6 +80,10 @@ define token crypt_pair (16)
   creg1=(0, 2)
   creg2=(4, 6)
   cimm2=(4, 9)
+
+
+  cunk1=(0, 3)
+  cunk2=(4, 9)
   subopcode_crypt=(10,15)
 ;
 

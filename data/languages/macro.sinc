@@ -1,3 +1,21 @@
+macro store32(addr, value) {
+  *:4 (addr) = value;
+}
+macro load32(dst1, addr) {
+  dst1 = *:4 (addr);
+}
+
+macro xbit(dst1, src1, bit1) {
+  dst1 = (src1 >> bit1) & 1;
+}
+macro bclr(reg1, bit1) {
+  reg1 = reg1 & ~(1 << bit1);
+}
+
+macro bset(reg1, bit1) {
+  reg1 = reg1 | (1 << bit1);
+}
+
 macro push32(val32) {
   sp = sp - 4;
   *:4 sp = val32;
@@ -6,6 +24,11 @@ macro push32(val32) {
 macro pop32(ret32) {
   sp = sp + 4;
   ret32 = *:4 sp;
+}
+
+macro ret() {
+  pop32(pc);
+  return [pc];
 }
 
 macro setResultFlags(result) {
@@ -44,6 +67,13 @@ macro shl32(dst, src1, src2) {
   setResultFlags(dst);
 }
 
+macro shr32(dst, src1, src2) {
+  dst = src1 >> (src2 & 0x1F);
+
+  $(O_flag) = 0;
+  setResultFlags(dst);
+}
+
 macro add(dst, src1, src2) {
   $(C_flag) = carry(src1,src2);
   $(O_flag) = scarry(src1,src2);
@@ -59,10 +89,21 @@ macro sub(dst, src1, src2) {
 }
 
 macro cmp(src1, src2) {
-  # TODO: so much flag correctness
+  # TODO: check flag correctness
   setResultFlags((src1 - src2));
   $(C_flag) = src1 < src2;
-  $(O_flag) = sborrow(src1,src2);
+  $(O_flag) = sborrow(src1, src2);
+}
+
+macro cmpu(src1, src2) {
+  # TODO: is this right?
+  $(C_flag) = (src1 < src2);
+  $(Z_flag) = (src1 == src2);
+}
+
+macro cmps(src1, src2) {
+  $(C_flag) = (src1 s< src2);
+  $(Z_flag) = (src1 == src2);
 }
 
 

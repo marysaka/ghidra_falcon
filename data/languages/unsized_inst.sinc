@@ -3,6 +3,36 @@ define pcodeop io_read;
 define pcodeop todo;
 define pcodeop io_write;
 
+
+define pcodeop cxor;
+define pcodeop cxset;
+define pcodeop cxsin_todo;
+define pcodeop cxsout_todo;
+define pcodeop cdec_todo;
+define pcodeop csigclr;
+define pcodeop cadd_todo;
+define pcodeop cand_todo;
+define pcodeop cenc_todo;
+define pcodeop ckeyreg_todo;
+define pcodeop csigenc_todo;
+define pcodeop csecret_todo;
+define pcodeop ckexp_todo;
+define pcodeop ckrexp_todo;
+define pcodeop cprecmac_todo;
+define pcodeop crev_todo;
+define pcodeop cs0begin;
+define pcodeop cs0exec;
+define pcodeop cs1begin;
+define pcodeop cs1exec;
+
+define pcodeop xdst;
+define pcodeop xdld;
+define pcodeop xcld;
+define pcodeop xcwait;
+define pcodeop xdwait;
+
+
+
 # TODO: check if that set flags on hardware
 macro muls(dst, src1, src2) {
   dst = sext(src1) * sext(src2);
@@ -23,7 +53,7 @@ bra_cc: "c"              is subopcodeL=0x08                              { c:1 =
 bra_cc: "o"              is subopcodeL=0x09                              { c:1 = ($(O_flag) == 1); export c; }
 bra_cc: "s"              is subopcodeL=0x0a                              { c:1 = ($(S_flag) == 1); export c; }
 bra_cc: "z"              is subopcodeL=0x0b                              { c:1 = ($(Z_flag) == 1); export c; }
-bra_cc: "a"              is subopcodeL=0x0c                              { c:1 = ($(C_flag) == 1) & ($(Z_flag) == 0); export c; }
+bra_cc: "a"              is subopcodeL=0x0c                              { c:1 = ($(C_flag) == 0) & ($(Z_flag) == 0); export c; }
 bra_cc: "na"             is subopcodeL=0x0d                              { c:1 = ($(C_flag) == 1) | ($(Z_flag) == 1); export c; }
 bra_cc:                  is subopcodeL=0x0e                              { c:1 = 1; export c; }
 bra_cc: "not p0"         is subopcodeL=0x10                              { c:1 = ($(P0_flag) == 0); export c; }
