@@ -65,7 +65,7 @@ Copy-paste and change the opcode/subopcode, mnemonic, and implementation:
 }
 ```
 
-Reload (with your `ReloadSleighLangauge.java` hotkey), disassembly the bytes (by pressing `D`), and check the output is correct. If it fails to disassemble, double check your code, or use `DebugSleighInstructionParse.java` to see where it goes wrong.
+Reload (with your `ReloadSleighLangauge.java` hotkey), disassemble the bytes (by pressing `D`), and check the output is correct. If it fails to disassemble, double check your code, or use `DebugSleighInstructionParse.java` to see where it goes wrong.
 
 If you hit errors reloading, you can view the log by clicking the "Show Console" icon at the bottom Ghidra project window (the one with the file listing, not the CodeBrowser/disassembly window). The errors are only helpful some of the time, so I usually check my changes by hand first to see if I can spot what I did wrong.
 
@@ -73,12 +73,17 @@ If you hit errors reloading, you can view the log by clicking the "Show Console"
 
 Personally I've avoided pre-emptively adding operations that I can't test/verify easily, because I'm sure I'd even more mistakes and not realise I hadn't verified things. It should be practical to generate a huge test file covering every instruction encoding with different operand values, and automatically compare the Ghidra and envydis output to finish the instruction decoding.
 
-Known issues:
+Known issues/todo-list:
 
-* crypto coprocessor stuff is incorrect and messy
-* separate the address spaces - this is causing weird problems
-* fix mpush/mpop implementation (and variants)
-* get arguments passed on the stack tested and working
+* fix mpop/mpush (and variants) to read/write all values
+* finalize calling convention (what's the deal with r9 and r15?)
+* rename "ram" to "iram" and document adding a "dram" section for globals
+* try making "io" a real address space? might make naming easier
+* see if there's a way to make crypto stuff decompile as `csecret(c1, 0x2)` instead of `csecret(1, 2)`
+* global stores can be reordered to come after pcodeop calls that implicitly read from them (probably a ghidra bug?)
+* can we bundle types? I'm loading an enum with io address constants (e.g. `FALCON_MAILBOX1 = 0x1100`) to make reversing easier. ("io" address space and default names might be the right approach?)
+* split common flags into their own 1-byte registers (like the x86 backend does) to shrink pcode size and make it easier to read. (we'll need to add packflags and unpackflags anywhere the flags register is read and written respectively)
+* update readme screenshot sometime - that function is looking a ton better already (https://imgur.com/KGQJebQ), but I want to try to get things stable first to avoid making the repo huge with png files
 
 ## Resources
 
