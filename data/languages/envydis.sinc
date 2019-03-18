@@ -753,7 +753,7 @@
 #
 #	{ 0x0000003f, 0x0000003f, OP2B, N("ld"), T(sz), REG2, DATAR, .fmask = F_FUC5P },
 :ld_b32 reg2, "D"^[reg1] is op_format=0x3F & op_size=2; reg2 & reg1  {
-  reg2 = *:4 (reg1);
+  load32(reg2, reg1);
 }
 
 #
@@ -782,7 +782,8 @@
 
 #	{ 0x000000c3, 0x000000ff, OP3B, N("extrs"), REG2, REG1, BITF8, .fmask = F_FUC3P },
 :extrs reg2, reg1, bitf8_0^":"^suffix is raw_opcode=0xc3; reg2 & reg1; bitf8_0 & bitf8_1 [ suffix=bitf8_0 + bitf8_1; ] {
-  reg2 = todo((reg1 >> bitf8_0) & ((1 << bitf8_1) - 1));
+  # TODO: macro this a lot
+  reg2 = (((reg1 >> bitf8_0) & ((1 << (bitf8_1+1)) - 1)) << (32 - (bitf8_1+1))) s>> (32 - (bitf8_1+1));
 }
 
 #	{ 0x000000c4, 0x000000ff, OP3B, N("and"), REG2, REG1, IMM8 },
