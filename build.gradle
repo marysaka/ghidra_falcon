@@ -65,7 +65,7 @@ task buildExtension (type: Zip, overwrite: true, dependsOn: 'sleighCompile') {
 
     from (project.projectDir) {
 		include 'data/languages/**'
-		include 'LICENSE'
+		include 'LICENSE.txt'
 		include 'extension.properties'
 
 		// MANDATORY
