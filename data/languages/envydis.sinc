@@ -371,12 +371,12 @@
   csigclr();
 }
 
-:crnd "TODO", cunk1, cunk2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; cunk1 & cunk2 & subopcode_crypt=(0x90 >> 2) {
-  crnd_todo(cunk1 :4, cunk2 :4);
+:crnd creg1 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & subopcode_crypt=(0x90 >> 2) {
+  crnd(creg1 :4);
 }
 
-:cchmod "TODO", cunk1, cunk2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; cunk1 & cunk2 & subopcode_crypt=(0xA8 >> 2) {
-  cchmod_todo(cunk1 :4, cunk2 :4);
+:cchmod creg1, cimm2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & cimm2 & subopcode_crypt=(0xA8 >> 2) {
+  cchmod(creg1 :4, cimm2 :4);
 }
 
 # cchmod
@@ -651,7 +651,9 @@
 #
 #	{ 0x00000039, 0x000f003f, OP3B, N("not"), T(sz), REG2, REG1 },
 :not_b32 reg1, reg2 is op_format=0x39 & op_size=2; reg2 & reg1; subopcode3=0x0 {
-  reg2 = todo_flags(~reg1); # flags
+  reg2 = ~reg1;
+  setResultFlags(reg2);
+  $(O_flag) = 0;
 }
 
 #	{ 0x00010039, 0x000f003f, OP3B, N("neg"), T(sz), REG2, REG1 },
@@ -809,7 +811,7 @@
 #	{ 0x000000cc, 0x000000ff, OP3B, N("div"), REG2, REG1, IMM8, .fmask = F_FUC3P },
 #	{ 0x000000cd, 0x000000ff, OP3B, N("mod"), REG2, REG1, IMM8, .fmask = F_FUC3P },
 :mod reg2, reg1, imm8 is raw_opcode=0xcd; reg2 & reg1; imm8 {
-  reg2 = todo(reg1, imm8 :1);
+  reg2 = reg1 % imm8;
 }
 
 #	{ 0x000000ce, 0x000000ff, OP3B, U("ce"), REG2, IORI },
@@ -1008,7 +1010,7 @@
 
 #	{ 0x000000f7, 0x000000ff, OP3B, N("iowrs"), IORI, REG2, .fmask = F_FUC5P },
 :iowrs [reg1^"+"^offset], reg2 is raw_opcode=0xf7; reg2 & reg1; imm8 [ offset=imm8 * 4; ] {
-  todo(reg1+offset, reg2);
+  io_write_sync(reg1+offset, reg2);
 }
 
 #
@@ -1221,7 +1223,7 @@
 #	{ 0x000c00ff, 0x000f00ff, OP3B, N("div"), REG3, REG1, REG2, .fmask = F_FUC3P },
 #	{ 0x000d00ff, 0x000f00ff, OP3B, N("mod"), REG3, REG1, REG2, .fmask = F_FUC3P },
 :mod reg3, reg1, reg2 is raw_opcode=0xff; reg2 & reg1; subopcode3=0xd & reg3 {
-  reg3 = todo(reg1, reg2);
+  reg3 = reg1 % reg2;
 }
 
 #	{ 0x000e00ff, 0x000f00ff, OP3B, U("ff/e"), REG3, IORR },

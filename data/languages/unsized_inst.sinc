@@ -1,6 +1,7 @@
 define pcodeop exit;
 define pcodeop io_read;
 define pcodeop io_write;
+define pcodeop io_write_sync;
 
 define pcodeop unkce_io_read;
 
@@ -31,8 +32,8 @@ define pcodeop cs0begin;
 define pcodeop cs0exec;
 define pcodeop cs1begin;
 define pcodeop cs1exec;
-define pcodeop crnd_todo;
-define pcodeop cchmod_todo;
+define pcodeop crnd;
+define pcodeop cchmod;
 
 define pcodeop xdst;
 define pcodeop xdld;
