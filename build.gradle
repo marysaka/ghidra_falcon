@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 //----------------------START "DO NOT MODIFY" SECTION------------------------------
 def ghidraInstallDir
 
@@ -15,3 +17,60 @@ else {
 	throw new GradleException("GHIDRA_INSTALL_DIR is not defined!")
 }
 //----------------------END "DO NOT MODIFY" SECTION-------------------------------
+
+def DISTRIBUTION_DIR = file("dist")
+def PATH_IN_ZIP = "${project.name}"
+
+archivesBaseName="Falcon"
+version = 1.0
+
+task sleighCompile(type: JavaExec) {
+    main = "ghidra.pcodeCPort.slgh_compile.SleighCompile"
+    classpath = configurations.compile
+    jvmArgs = ['-Xmx2048M']
+    args = ['-a', 'data/languages']
+}
+
+task sleighClean(type: Delete) {
+    delete fileTree('data/languages') {
+        include '**/*.sla'
+    }
+}
+
+task distClean(type: Delete) {
+    delete fileTree('dist') {
+        include '**/*'
+    }
+}
+
+clean.dependsOn(sleighClean)
+clean.dependsOn(distClean)
+
+task buildExtension (type: Zip, overwrite: true, dependsOn: 'sleighCompile') {
+    baseName "${project.name}-${project.version}"
+    extension 'zip'
+    destinationDir DISTRIBUTION_DIR
+	version ''
+
+	duplicatesStrategy 'exclude'
+
+    File propFile = new File(project.projectDir, "extension.properties")
+    from (propFile) {
+        String version = "${ghidra_version}"
+        String name = "${project.name}"
+        filter (ReplaceTokens, tokens: [extversion: version])
+        filter (ReplaceTokens, tokens: [extname: name])
+        into PATH_IN_ZIP
+	}
+
+    from (project.projectDir) {
+		include 'data/languages/**'
+		include 'LICENSE'
+		include 'extension.properties'
+
+		// MANDATORY
+		include 'Module.manifest'
+
+        into PATH_IN_ZIP
+	}
+}

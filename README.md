@@ -4,9 +4,14 @@ This is pretty immature, so you'll probably need to do some development to use i
 
 ![Screenshot](/images/screenshot1.png)
 
-## (TODO) Setup instructions
+## Setup instructions
 
-I just created a new Ghidra plugin in Eclipse and replaced the files with the files from this repo, but I'm sure there's a better way (?)
+- Ensure you have the ``JAVA_HOME`` environment variable set to the path of your JDK 11 installation.
+- Set the ``GHIDRA_INSTALL_DIR`` environment variable to your Ghidra install directory.
+- Run ``./gradlew``
+- You'll find the output zip file inside ``/dist``
+- Copy the output zip to ``<Ghidra install directory>/Extensions/Ghidra``
+- Start Ghidra and use the "Install Extensions" dialog to finish the installation (``File -> Install Extensions...``)
 
 ## Development
 
