@@ -14,9 +14,6 @@ define register offset=0 size=4 [
   # offset = 0x40
   iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus 
 
-  # offset = 0x80
-  # TODO: what size are these really?
-  c0 c1 c2 c3 c4 c5 c6 c7
 ];
 
 # TODO: define flags?
@@ -34,6 +31,7 @@ define register offset=0 size=4 [
 @define O_flag "flags[9, 1]"
 @define S_flag "flags[10, 1]"
 @define Z_flag "flags[11, 1]"
+
 
 # 8 bits format & size of opcode
 define token opcode_len_format (8)
@@ -141,8 +139,7 @@ attach variables [ sreg1 sreg2 ]
   iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus _ _ _
 ];
 
-
-attach variables [ creg1 creg2 ]
+attach names [ creg1 creg2 ]
 [
   c0 c1 c2 c3 c4 c5 c6 c7
 ];

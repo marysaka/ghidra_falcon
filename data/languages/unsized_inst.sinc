@@ -1,29 +1,38 @@
 define pcodeop exit;
 define pcodeop io_read;
-define pcodeop todo;
 define pcodeop io_write;
 
+define pcodeop unkce_io_read;
 
+define pcodeop todo;
+define pcodeop todo_flags;
+
+
+define pcodeop vtlb;
+
+define pcodeop cmov;
 define pcodeop cxor;
 define pcodeop cxset;
-define pcodeop cxsin_todo;
-define pcodeop cxsout_todo;
-define pcodeop cdec_todo;
+define pcodeop cxsin;
+define pcodeop cxsout;
+define pcodeop cdec;
 define pcodeop csigclr;
-define pcodeop cadd_todo;
-define pcodeop cand_todo;
-define pcodeop cenc_todo;
-define pcodeop ckeyreg_todo;
-define pcodeop csigenc_todo;
-define pcodeop csecret_todo;
-define pcodeop ckexp_todo;
-define pcodeop ckrexp_todo;
-define pcodeop cgfmul_todo;
-define pcodeop crev_todo;
+define pcodeop cadd;
+define pcodeop cand;
+define pcodeop cenc;
+define pcodeop ckeyreg;
+define pcodeop csigenc;
+define pcodeop csecret;
+define pcodeop ckexp;
+define pcodeop ckrexp;
+define pcodeop cgfmul;
+define pcodeop crev;
 define pcodeop cs0begin;
 define pcodeop cs0exec;
 define pcodeop cs1begin;
 define pcodeop cs1exec;
+define pcodeop crnd_todo;
+define pcodeop cchmod_todo;
 
 define pcodeop xdst;
 define pcodeop xdld;

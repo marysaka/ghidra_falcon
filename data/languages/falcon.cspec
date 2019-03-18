@@ -19,7 +19,7 @@
   </returnaddress>
   <default_proto>
     <!-- FIXME: this needs more research -->
-    <prototype name="fake_prototype" extrapop="4" stackshift="4">
+    <prototype name="falcon_prototype" extrapop="4" stackshift="4">
       <input>
         <pentry minsize="1" maxsize="4">
           <register name="r10"/>
@@ -36,9 +36,11 @@
         <pentry minsize="1" maxsize="4">
           <register name="r14"/>
         </pentry>
+        <!-- (looks like this is not an argument)
         <pentry minsize="1" maxsize="4">
           <register name="r15"/>
         </pentry>
+        -->
         <pentry minsize="1" maxsize="500" align="4">
           <addr offset="4" space="stack"/>
         </pentry>
@@ -49,7 +51,16 @@
         </pentry>
       </output>
       <unaffected>
+        <register name="r0"/>
         <register name="r1"/>
+        <register name="r2"/>
+        <register name="r3"/>
+        <register name="r4"/>
+        <register name="r5"/>
+        <register name="r6"/>
+        <register name="r7"/>
+        <register name="r8"/>
+        <!-- not sure about r9 -->
         <register name="sp"/>
       </unaffected>
       <localrange>
