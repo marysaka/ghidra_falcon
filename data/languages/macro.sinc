@@ -1,11 +1,17 @@
 macro store32(addr, value) {
   *[dram]:4 (addr) = value;
 }
+macro store16(addr, value) {
+  *[dram]:2 (addr) = value;
+}
 macro store8(addr, value) {
   *[dram]:1 (addr) = value;
 }
 macro load32(dst1, addr) {
   dst1 = *[dram]:4 (addr);
+}
+macro load16(dst1, addr) {
+  dst1 = *[dram]:2 (addr);
 }
 macro load8(dst1, addr) {
   dst1 = *[dram]:1 (addr);
@@ -75,6 +81,13 @@ macro shl32(dst, src1, src2) {
 
 macro shr32(dst, src1, src2) {
   dst = src1 >> (src2 & 0x1F);
+
+  $(O_flag) = 0;
+  setResultFlags(dst);
+}
+
+macro sar32(dst, src1, src2) {
+  dst = src1 s>> (src2 & 0x1F);
 
   $(O_flag) = 0;
   setResultFlags(dst);

@@ -65,6 +65,8 @@ define token opcode_byte2 (8)
 
   bitf8_0=(0,4)
   bitf8_1=(5,7)
+
+  subopcode_crypti=(0,4)
 ;
 
 
@@ -98,6 +100,9 @@ define token opcode_immediate16 (16)
   imm16s=(0, 15) signed
   fimm16=(0, 15)
   fimm16s=(0, 15) signed
+
+  bitf16_0=(0,4)
+  bitf16_1=(5,9)
 ;
 
 define token opcode_immediate24 (24)
