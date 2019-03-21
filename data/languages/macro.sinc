@@ -48,6 +48,10 @@ macro setResultFlags(result) {
   $(S_flag) = (result s< 0);
 }
 
+macro clear(dst) {
+  dst = 0;
+}
+
 macro and(dst, src1, src2) {
   dst = src1 & src2;
 

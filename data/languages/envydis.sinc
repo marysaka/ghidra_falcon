@@ -929,14 +929,14 @@
 
 #	{ 0x0000043d, 0x00000f3f, OP2B, N("clear"), T(sz), REG1 },
 :clear_b32 reg1 is op_format=0x3D & op_size=2; subopcode2=0x4 & reg1  {
-  reg1 = 0;
+  clear(reg1 :4);
 }
 :clear_b16 reg1 is op_format=0x3D & op_size=1; subopcode2=0x4 & reg1  {
-  reg1 = reg1 & 0xFFFF0000;
+  clear(reg1 :2);
 }
 :clear_b8 reg1 is op_format=0x3D & op_size=0; subopcode2=0x4 & reg1  {
   # TODO: why does "reg1 :1 = 0;" error?
-  reg1 = reg1 & 0xFFFFFF00;
+  clear(reg1 :1);
 }
 
 #	{ 0x0000053d, 0x00000f3f, OP2B, N("setf"), T(sz), REG1, .fmask = F_FUC3P },
