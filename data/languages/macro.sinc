@@ -2,7 +2,6 @@ macro todo_binop(dst, src1, src2) {
   dst = todo(src1, src2);
 }
 
-
 macro store32(addr, value) {
   *[dram]:4 (addr) = value;
 }
@@ -27,7 +26,6 @@ macro xbit(dst1, src1, bit1) {
 }
 
 macro op_sext(dst, src1, src2) {
-  #dst = (src1 << (32 - (src2 & 0x1F))) s>> (32 - (src2 & 0x1F));
   local shift_distance = (31 - (src2 & 0x1F));
   dst = (src1 << shift_distance) s>> shift_distance;
 }
@@ -69,7 +67,7 @@ macro clear(dst) {
 }
 
 macro mov(dst, src) {
-  dst = 0;
+  dst = src;
 }
 
 macro and(dst, src1, src2) {

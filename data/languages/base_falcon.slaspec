@@ -9,16 +9,24 @@ define space register type=register_space size=4;
 
 # gpr
 define register offset=0 size=4 [
-
   r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15
-
-  # offset = 0x40
-  iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus 
-
 ];
 
+define register offset=0x40 size=4 [
+  iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus
+];
+
+# unpacked flags
+define register offset=0x100 size=1 [
+  CF # bit 8
+  OF # bit 9
+  SF # bit 10
+  ZF # bit 11
+];
+
+
+
 # TODO: define flags?
-#define register offset=0x40 size=4 [iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus];
 
 @define P0_flag "flags[0, 1]"
 @define P1_flag "flags[1, 1]"
@@ -28,10 +36,26 @@ define register offset=0 size=4 [
 @define P5_flag "flags[5, 1]"
 @define P6_flag "flags[6, 1]"
 @define P7_flag "flags[7, 1]"
-@define C_flag "flags[8, 1]"
-@define O_flag "flags[9, 1]"
-@define S_flag "flags[10, 1]"
-@define Z_flag "flags[11, 1]"
+@define C_flag "CF"
+@define O_flag "OF"
+@define S_flag "SF"
+@define Z_flag "ZF"
+
+macro unpackflags(tmp) {
+  CF = (tmp & 0x100) != 0;
+  OF = (tmp & 0x200) != 0;
+  SF = (tmp & 0x400) != 0;
+  ZF = (tmp & 0x800) != 0;
+}
+
+macro packflags(tmp) {
+  tmp = (tmp & 0xFFFFF0FF)
+    | (0x100 * zext(CF & 1))
+    | (0x200 * zext(OF & 1))
+    | (0x400 * zext(SF & 1))
+    | (0x800 * zext(ZF & 1));
+}
+
 
 
 # 8 bits format & size of opcode

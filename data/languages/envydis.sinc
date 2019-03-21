@@ -632,7 +632,9 @@
 #	{ 0x00000cf0, 0x00000fff, T(ol0), N("xbit"), REG1, FLAGS, T(fl) },
 :xbit reg1, flags, imm8 is raw_opcode=0xf0; subopcode2=0xC & reg1 & flags; imm8 {
   # TODO: display flag name
+  packflags(flags);
   xbit(reg1, flags, imm8);
+  unpackflags(flags);
 }
 
 #	{ 0x000000f0, 0x000000fe, T(ol0), OOPS, REG1, T(i) },
@@ -779,16 +781,27 @@
 #	{ 0x000031f4, 0x00003fff, T(ol0), N("bset"), FLAGS, T(fl) },
 :bset flags, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & flags ; imm8 {
   # TODO: display flag name
+  packflags(flags);
   bset(flags, imm8);
+  unpackflags(flags);
 }
 
 #	{ 0x000032f4, 0x00003fff, T(ol0), N("bclr"), FLAGS, T(fl) },
 :bclr flags, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & flags ; imm8 {
   # TODO: display flag name
+  packflags(flags);
   bclr(flags, imm8);
+  unpackflags(flags);
 }
 
 #	{ 0x000033f4, 0x00003fff, T(ol0), N("btgl"), FLAGS, T(fl) },
+:btgl flags, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x33 & flags ; imm8 {
+  # TODO: display flag name
+  packflags(flags);
+  btgl(flags, imm8);
+  unpackflags(flags);
+}
+
 #	{ 0x00003cf4, 0x00003fff, T(ol0), N("cxset"), IMM8, .fmask = F_CRYPT },
 :cxset imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x3c ; imm8 {
   cxset(imm8 :1);
@@ -876,12 +889,26 @@
 }
 
 #	{ 0x000009f9, 0x00000fff, OP2B, N("bset"), FLAGS, REG1 },
+:bset flags, reg1 is raw_opcode=0xf9; subopcode2=0x9 & reg1 & flags {
+  packflags(flags);
+  bset(flags, (reg1 & 0x1F));
+  unpackflags(flags);
+}
+
 #	{ 0x00000af9, 0x00000fff, OP2B, N("bclr"), FLAGS, REG1 },
 :bclr flags, reg1 is raw_opcode=0xf9; subopcode2=0xa & reg1 & flags {
+  packflags(flags);
   bclr(flags, (reg1 & 0x1F));
+  unpackflags(flags);
 }
 
 #	{ 0x00000bf9, 0x00000fff, OP2B, N("btgl"), FLAGS, REG1 },
+:btgl flags, reg1 is raw_opcode=0xf9; subopcode2=0xb & reg1 & flags {
+  packflags(flags);
+  btgl(flags, (reg1 & 0x1F));
+  unpackflags(flags);
+}
+
 #	{ 0x000000f9, 0x000000ff, OP2B, OOPS, REG1 },
 #
 #	{ 0x000000fa, 0x000f00ff, OP3B, N("iowr"), IOR, REG2 },
@@ -891,7 +918,7 @@
 
 #	{ 0x000100fa, 0x000f00ff, OP3B, N("iowrs"), IOR, REG2, .fmask = F_FUC3P },
 :iowrs "I"^[reg1], reg2 is raw_opcode=0xfa; reg2 & reg1; subopcode3=1 {
-  todo();
+  io_write_sync(reg1, reg2);
 }
 
 #	{ 0x000400fa, 0x000f00ff, OP3B, N("xcld"), REG1, REG2 },
@@ -911,7 +938,10 @@
 
 #	{ 0x000800fa, 0x000f00ff, OP3B, N("setp"), REG2, REG1 },
 :setp reg2, reg1 is raw_opcode=0xFA; reg2 & reg1; subopcode3=0x8 {
-  todo();
+  packflags(flags);
+  local shift = reg1 & 0x1F;
+  flags = (flags & ~(1 << shift)) | ((reg2 & 1) << shift);
+  unpackflags(flags);
 }
 
 #	{ 0x000000fa, 0x000000ff, OP3B, OOPS, REG1, REG2 },
@@ -1013,10 +1043,12 @@
 #	{ 0x000000fe, 0x000f00ff, OP3B, N("mov"), SREG2, REG1 },
 :mov sreg2, reg1 is raw_opcode=0xfe; reg1 & sreg2; subopcode3=0x0 {
   sreg2 = reg1;
+  # TODO: unpack flags
 }
 
 #	{ 0x000100fe, 0x000f00ff, OP3B, N("mov"), REG2, SREG1 },
 :mov reg2, sreg1 is raw_opcode=0xfe; sreg1 & reg2; subopcode3=0x1 {
+  # TODO: pack flags
   reg2 = sreg1;
 }
 
@@ -1032,7 +1064,9 @@
 
 #	{ 0x000c00fe, 0x000f00ff, OP3B, N("xbit"), REG2, FLAGS, REG1 },
 :xbit reg2, flags, reg1 is raw_opcode=0xfe; reg2 & reg1 & flags; subopcode3=0xc {
+  packflags(flags);
   xbit(reg2, flags, reg1);
+  unpackflags(flags);
 }
 
 #	{ 0x000000fe, 0x000000ff, OP3B, OOPS, REG2, REG1 },
