@@ -143,3 +143,28 @@ macro cmps(src1, src2) {
 macro mulu(dst, src1, src2) {
   dst = zext(src1) * zext(src2);
 }
+
+macro hswap16(dst, src) {
+  dst = ((src & 0xFF) << 8) | ((src & 0xFF00) >> 8);
+  setResultFlags(dst);
+  $(O_flag) = 0;
+}
+
+macro hswap8(dst, src) {
+  # TODO: is this even a thing?
+  dst = ((src & 0xF) << 4) | ((src & 0xF0) >> 4);
+  setResultFlags(dst);
+  $(O_flag) = 0;
+}
+
+macro not(dst, src) {
+  dst = ~src;
+  setResultFlags(dst);
+  $(O_flag) = 0;
+}
+
+macro neg(dst, src) {
+  dst = -src;
+  setResultFlags(dst);
+  $(O_flag) = sborrow(0, dst);
+}
