@@ -1,6 +1,3 @@
-
-
-
 @ifdef ONCE
 #static struct insn tabsi[] = {
 #	{ 0x00000000, 0x0000003f, OP3B, N("st"), T(sz), T(datari), REG2, .fmask = F_FUCOLD },
@@ -21,75 +18,60 @@
   reg0 = fimm24s;
 }
 
+@endif
+@ifndef ONCE
 #
 #	{ 0x00000010, 0x0000003f, OP3B, N("add"), T(sz), REG2, REG1, IMM8 },
-:add_b32 reg2, reg1, imm8 is op_format=0x10 & op_size=2; reg2 & reg1; imm8 {
-  add(reg2, reg1, imm8);
-}
-:add_b16 reg2, reg1, imm8 is op_format=0x10 & op_size=1; reg2 & reg1; imm8 {
-  add(reg2 :2, reg1 :2, imm8);
-}
-:add_b8 reg2, reg1, imm8 is op_format=0x10 & op_size=0; reg2 & reg1; imm8 {
-  add(reg2 :1, reg1 :1, imm8);
+:add^$(SZ_SUFFIX) reg2, reg1, imm8 is op_format=0x10; reg2 & reg1; imm8 {
+  add(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
 }
 
 #	{ 0x00000011, 0x0000003f, OP3B, N("adc"), T(sz), REG2, REG1, IMM8 },
-:adc_b32 reg2, reg1, imm8 is op_format=0x11 & op_size=2; reg2 & reg1; imm8 {
-  reg2 = todo(reg1, imm8 :1);
-  #adc(reg2, reg1, imm8);
+:adc^$(SZ_SUFFIX) reg2, reg1, imm8 is op_format=0x11; reg2 & reg1; imm8 {
+  todo_binop(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8 :1);
+  #adc(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
 }
 
 #	{ 0x00000012, 0x0000003f, OP3B, N("sub"), T(sz), REG2, REG1, IMM8 },
-:sub_b32 reg2, reg1, imm8 is op_format=0x12 & op_size=2; reg2 & reg1; imm8 {
-  sub(reg2, reg1, imm8);
-}
-:sub_b16 reg2, reg1, imm8 is op_format=0x12 & op_size=1; reg2 & reg1; imm8 {
-  sub(reg2:2, reg1:2, imm8);
-}
-:sub_b8 reg2, reg1, imm8 is op_format=0x12 & op_size=0; reg2 & reg1; imm8 {
-  sub(reg2:1, reg1:1, imm8);
+:sub^$(SZ_SUFFIX) reg2, reg1, imm8 is op_format=0x12; reg2 & reg1; imm8 {
+  sub(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
 }
 
 #	{ 0x00000013, 0x0000003f, OP3B, N("sbb"), T(sz), REG2, REG1, IMM8 },
-#	{ 0x00000014, 0x0000003f, OP3B, N("shl"), T(sz), REG2, REG1, IMM8 },
-:shl_b32 reg2, reg1, imm8 is op_format=0x14 & op_size=2; reg2 & reg1; imm8 {
-  shl32(reg2, reg1, imm8);
-}
-:shl_b16 reg2, reg1, imm8 is op_format=0x14 & op_size=1; reg2 & reg1; imm8 {
-  shl32(reg2:2, reg1:2, imm8);
-}
-:shl_b8 reg2, reg1, imm8 is op_format=0x14 & op_size=0; reg2 & reg1; imm8 {
-  shl32(reg2:1, reg1:1, imm8);
+:sbb^$(SZ_SUFFIX) reg2, reg1, imm8 is op_format=0x13; reg2 & reg1; imm8 {
+  todo_binop(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8 :1);
+  #sbb(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
 }
 
+#	{ 0x00000014, 0x0000003f, OP3B, N("shl"), T(sz), REG2, REG1, IMM8 },
+:shl^$(SZ_SUFFIX) reg2, reg1, imm8 is op_format=0x14; reg2 & reg1; imm8 {
+  # TODO: fix mask
+  shl32(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
+}
+
+
 #	{ 0x00000015, 0x0000003f, OP3B, N("shr"), T(sz), REG2, REG1, IMM8 },
-:shr_b32 reg2, reg1, imm8 is op_format=0x15 & op_size=2; reg2 & reg1; imm8 {
-  shr32(reg2, reg1, imm8);
-}
-:shr_b16 reg2, reg1, imm8 is op_format=0x15 & op_size=1; reg2 & reg1; imm8 {
-  shr32(reg2:2, reg1:2, imm8);
-}
-:shr_b8 reg2, reg1, imm8 is op_format=0x15 & op_size=0; reg2 & reg1; imm8 {
-  shr32(reg2:1, reg1:1, imm8);
+:shr^$(SZ_SUFFIX) reg2, reg1, imm8 is op_format=0x15; reg2 & reg1; imm8 {
+  # TODO: fix mask
+  shr32(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
 }
 
 #	{ 0x00000017, 0x0000003f, OP3B, N("sar"), T(sz), REG2, REG1, IMM8 },
-:sar_b32 reg2, reg1, imm8 is op_format=0x17 & op_size=2; reg2 & reg1; imm8 {
-  sar32(reg2, reg1, imm8);
-}
-:sar_b16 reg2, reg1, imm8 is op_format=0x17 & op_size=1; reg2 & reg1; imm8 {
-  sar32(reg2:2, reg1:2, imm8);
+:sar^$(SZ_SUFFIX) reg2, reg1, imm8 is op_format=0x17; reg2 & reg1; imm8 {
+  # TODO: fix mask
+  sar32(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
 }
 
 #	{ 0x00000018, 0x0000003f, OP3B, N("ld"), T(sz), REG2, T(datari) },
-:ld_b32 reg2, "D"^[reg1 + offset] is op_format=0x18 & op_size=2; reg2 & reg1; imm8 [ offset=imm8 * 4; ] {
-  load32(reg2, reg1 + offset);
-}
-:ld_b16 reg2, "D"^[reg1 + offset] is op_format=0x18 & op_size=1; reg2 & reg1; imm8 [ offset=imm8 * 2; ] {
-  load16(reg2:2, reg1 + offset);
-}
-:ld_b8 reg2, "D"^[reg1 + offset] is op_format=0x18 & op_size=0; reg2 & reg1; imm8 [ offset=imm8 * 1; ] {
-  load8(reg2:1, reg1 + offset);
+:ld^$(SZ_SUFFIX) reg2, "D"^[reg1 + offset] is op_format=0x18; reg2 & reg1; imm8 [ offset=imm8 * $(SZ_BYTES); ] {
+@if SZ_BITS == "32"
+  load32
+@elif SZ_BITS == "16"
+  load16
+@elif SZ_BITS == "8"
+  load8
+@endif
+    (reg2, reg1 + offset);
 }
 
 #	{ 0x0000001c, 0x0000003f, OP3B, N("shlc"), T(sz), REG2, REG1, IMM8 },
@@ -103,123 +85,94 @@
 #	{ 0x00000020, 0x00000030, OP4B, OOPS, T(sz), REG2, REG1, IMM16, .fmask = F_FUCOLD },
 #
 #	{ 0x00000020, 0x0000003f, OP2B, N("st"), T(sz), DATAR, REG2, .fmask = F_FUC5P },
-:st_b32 "D"^[reg1], reg2 is op_format=0x20 & op_size=2; reg2 & reg1 {
-  store32(reg1, reg2);
-}
-:st_b16 "D"^[reg1], reg2 is op_format=0x20 & op_size=1; reg2 & reg1 {
-  store16(reg1, reg2);
-}
-:st_b8 "D"^[reg1], reg2 is op_format=0x20 & op_size=0; reg2 & reg1 {
-  store8(reg1, reg2);
+:st^$(SZ_SUFFIX) "D"^[reg1], reg2 is op_format=0x20; reg2 & reg1 {
+@if SZ_BITS == "32"
+  store32
+@elif SZ_BITS == "16"
+  store16
+@elif SZ_BITS == "8"
+  store8
+@endif
+    (reg1, reg2);
 }
 
 #	{ 0x00000021, 0x0000003f, OP2B, N("st"), T(sz), T(dataspr), REG1, .fmask = F_FUC5P },
 #	{ 0x00000024, 0x0000003f, OP2B, N("cmpu"), T(sz), REG1, REG2, .fmask = F_FUC5P },
-:cmpu_b32 reg1, reg2 is op_format=0x24 & op_size=2; reg2 & reg1 {
-  cmpu(reg1, reg2);
+:cmpu^$(SZ_SUFFIX) reg1, reg2 is op_format=0x24; reg2 & reg1 {
+  cmpu(reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
 }
 
 #	{ 0x00000025, 0x0000003f, OP2B, N("cmps"), T(sz), REG1, REG2, .fmask = F_FUC5P },
+:cmps^$(SZ_SUFFIX) reg1, reg2 is op_format=0x25; reg2 & reg1 {
+  cmps(reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
+}
+
 #	{ 0x00000026, 0x0000003f, OP2B, N("cmp"), T(sz), REG1, REG2, .fmask = F_FUC5P },
-:cmp_b32 reg1, reg2 is op_format=0x26 & op_size=2; reg2 & reg1 {
-  cmp(reg1, reg2);
-}
-:cmp_b16 reg1, reg2 is op_format=0x26 & op_size=1; reg2 & reg1 {
-  cmp(reg1:2, reg2:2);
-}
-:cmp_b8 reg1, reg2 is op_format=0x26 & op_size=0; reg2 & reg1 {
-  cmp(reg1:1, reg2:1);
+:cmp^$(SZ_SUFFIX) reg1, reg2 is op_format=0x26; reg2 & reg1 {
+  cmp(reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
 }
 
 #	{ 0x00000020, 0x00000030, OP2B, OOPS, T(sz), REG1, REG2, .fmask = F_FUC5P },
 #
 #
 #	{ 0x00000130, 0x00000f3f, T(ol0), N("st"), T(sz), T(datasp), REG1 },
-:st_b32 "D"^[sp + offset], reg1 is op_format=0x30 & op_size=2; subopcode2=0x1 & reg1 & sp ; imm8 [ offset=imm8 * 4; ] {
-  store32(sp + offset, reg1);
-}
-:st_b16 "D"^[sp + offset], reg1 is op_format=0x30 & op_size=1; subopcode2=0x1 & reg1 & sp ; imm8 [ offset=imm8 * 2; ] {
-  store16(sp + offset, reg1);
-}
-:st_b8 "D"^[sp + offset], reg1 is op_format=0x30 & op_size=0; subopcode2=0x1 & reg1 & sp ; imm8 [ offset=imm8 * 1; ] {
-  store8(sp + offset, reg1);
+:st^$(SZ_SUFFIX) "D"^[sp + offset], reg1 is op_format=0x30; subopcode2=0x1 & reg1 & sp ; imm8 [ offset=imm8 * $(SZ_BYTES); ] {
+@if SZ_BITS == "32"
+  store32
+@elif SZ_BITS == "16"
+  store16
+@elif SZ_BITS == "8"
+  store8
+@endif
+    (sp + offset, reg1);
 }
 
 #	{ 0x00000430, 0x00000f3e, T(ol0), N("cmpu"), T(sz), REG1, T(i) },
-:cmpu_b32 reg1, imm8 is op_format=0x30 & op_size=2; subopcode2=0x4 & reg1 ; imm8 {
-  cmpu(reg1, imm8);
+:cmpu^$(SZ_SUFFIX) reg1, imm8 is op_format=0x30; subopcode2=0x4 & reg1 ; imm8 {
+  cmpu(reg1:$(SZ_BYTES), imm8);
 }
-:cmpu_b32 reg1, imm16 is op_format=0x31 & op_size=2; subopcode2=0x4 & reg1 ; imm16 {
-  cmpu(reg1, imm16);
+:cmpu^$(SZ_SUFFIX) reg1, imm16 is op_format=0x31; subopcode2=0x4 & reg1 ; imm16 {
+  cmpu(reg1:$(SZ_BYTES), imm16);
 }
 
 #	{ 0x00000530, 0x00000f3e, T(ol0), N("cmps"), T(sz), REG1, T(is) },
-
-:cmps_b32 reg1, imm8 is op_format=0x30 & op_size=2; subopcode2=0x5 & reg1 ; imm8 {
-  cmps(reg1, imm8);
+:cmps^$(SZ_SUFFIX) reg1, imm8 is op_format=0x30; subopcode2=0x5 & reg1 ; imm8 {
+  cmps(reg1:$(SZ_BYTES), imm8);
 }
-:cmps_b32 reg1, imm16 is op_format=0x31 & op_size=2; subopcode2=0x5 & reg1 ; imm16 {
-  cmps(reg1, imm16);
+:cmps^$(SZ_SUFFIX) reg1, imm16 is op_format=0x31; subopcode2=0x5 & reg1 ; imm16 {
+  cmps(reg1:$(SZ_BYTES), imm16);
 }
-
 
 #	{ 0x00000630, 0x00000f3e, T(ol0), N("cmp"), T(sz), REG1, T(is), .fmask = F_FUC3P },
-:cmp_b32 reg1, imm8 is op_format=0x30 & op_size=2; subopcode2=0x6 & reg1 ; imm8 {
-  cmp(reg1, imm8);
+:cmp^$(SZ_SUFFIX) reg1, imm8 is op_format=0x30; subopcode2=0x6 & reg1 ; imm8 {
+  cmp(reg1:$(SZ_BYTES), imm8);
 }
-:cmp_b16 reg1, imm8 is op_format=0x30 & op_size=1; subopcode2=0x6 & reg1 ; imm8 {
-  cmp(reg1 :2, imm8);
+:cmp^$(SZ_SUFFIX) reg1, imm16 is op_format=0x31; subopcode2=0x6 & reg1 ; imm16 {
+  cmp(reg1:$(SZ_BYTES), imm16);
 }
-:cmp_b8 reg1, imm8 is op_format=0x30 & op_size=0; subopcode2=0x6 & reg1 ; imm8 {
-  cmp(reg1 :1, imm8);
-}
-
-:cmp_b32 reg1, imm16 is op_format=0x31 & op_size=2; subopcode2=0x6 & reg1 ; imm16 {
-  cmp(reg1, imm16);
-}
-:cmp_b16 reg1, imm16 is op_format=0x31 & op_size=1; subopcode2=0x6 & reg1 ; imm16 {
-  cmp(reg1 :2, imm16);
-}
-
 
 #	{ 0x00000030, 0x0000003e, T(ol0), OOPS, T(sz), REG1, T(i) },
 #
 #	{ 0x00000032, 0x0000003f, OP2B, N("mov"), T(sz), REG2, REG1, .fmask = F_FUC5P },
-:mov_b32 reg2, reg1 is op_format=0x32 & op_size=2; reg2 & reg1 {
-  reg2 = reg1;
-}
-:mov_b16 reg2, reg1 is op_format=0x32 & op_size=1; reg2 & reg1 {
-  # TODO: maybe we need to use "reg1h"
-  reg2 = (reg2 & 0xFFFF0000) | (reg1 & 0xFFFF);
-}
-:mov_b8 reg2, reg1 is op_format=0x32 & op_size=0; reg2 & reg1 {
-  # TODO: maybe we need to use "reg1b"
-  reg2 = (reg2 & 0xFFFFFF00) | (reg1 & 0xFF);
+:mov^$(SZ_SUFFIX) reg2, reg1 is op_format=0x32; reg2 & reg1 {
+  mov(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES));
 }
 
 #
 #	/* XXX not verified yet */
 #	{ 0x00000033, 0x00000f3f, OP4B, N("bra"), T(sz), REG1, IMM8, N("e"), SFBTARG, .fmask = F_FUC5P },
-:bra_b32 reg1, imm8, "e", rel8 is op_format=0x33 & op_size=2; subopcode2=0x0 & reg1; imm8; rel8 {
-  if (reg1 == imm8) goto rel8;
-}
-:bra_b16 reg1, imm8, "e", rel8 is op_format=0x33 & op_size=1; subopcode2=0x0 & reg1; imm8; rel8 {
-  if ((reg1:2) == imm8) goto rel8;
-}
-:bra_b8 reg1, imm8, "e", rel8 is op_format=0x33 & op_size=0; subopcode2=0x0 & reg1; imm8; rel8 {
-  if ((reg1:1) == imm8) goto rel8;
+:bra^$(SZ_SUFFIX) reg1, imm8, "e", rel8 is op_format=0x33; subopcode2=0x0 & reg1; imm8; rel8 {
+  if ((reg1:$(SZ_BYTES)) == imm8) goto rel8;
 }
 
+
 #	{ 0x00000433, 0x00000f3f, OP4B, N("bra"), T(sz), REG1, IMM8, N("ne"), SFBTARG, .fmask = F_FUC5P },
-:bra_b32 reg1, imm8, "ne", rel8 is op_format=0x33 & op_size=2; subopcode2=0x4 & reg1; imm8; rel8 {
-  if (reg1 != imm8) goto rel8;
+:bra^$(SZ_SUFFIX) reg1, imm8, "ne", rel8 is op_format=0x33; subopcode2=0x4 & reg1; imm8; rel8 {
+  if ((reg1:$(SZ_BYTES)) != imm8) goto rel8;
 }
-:bra_b16 reg1, imm8, "ne", rel8 is op_format=0x33 & op_size=1; subopcode2=0x4 & reg1; imm8; rel8 {
-  if ((reg1 :2) != imm8) goto rel8;
-}
-:bra_b8 reg1, imm8, "ne", rel8 is op_format=0x33 & op_size=0; subopcode2=0x4 & reg1; imm8; rel8 {
-  if ((reg1 :1) != imm8) goto rel8;
-}
+
+@endif # !ONCE
+@ifdef ONCE
 
 #	{ 0x00000933, 0x00000f3f, OP5B, N("bra"), T(sz), REG1, IMM8, N("e"), LFBTARG, .fmask = F_FUC5P },
 :bra_b32 reg1, imm8, "e", rel16 is op_format=0x33 & op_size=2; subopcode2=0x9 & reg1; imm8; rel16 {

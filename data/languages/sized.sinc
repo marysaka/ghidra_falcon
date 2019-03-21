@@ -2,16 +2,19 @@
 with : op_size=2 ... {
 @define SZ_SUFFIX ""_b32""
 @define SZ_BYTES "4"
+@define SZ_BITS "32"
 
 @include "sized_include.sinc"
 
 @undef SZ_SUFFIX
 @undef SZ_BYTES
+@undef SZ_BITS
 }
 
 
 @define SZ_SUFFIX ""_b16""
 @define SZ_BYTES "2"
+@define SZ_BITS "16"
 with : op_size=1 ... {
 
 @include "sized_include.sinc"
@@ -19,10 +22,12 @@ with : op_size=1 ... {
 } # with
 @undef SZ_SUFFIX
 @undef SZ_BYTES
+@undef SZ_BITS
 
 
 @define SZ_SUFFIX ""_b8""
 @define SZ_BYTES "1"
+@define SZ_BITS "8"
 with : op_size=0 ... {
 
 @include "sized_include.sinc"
@@ -30,10 +35,17 @@ with : op_size=0 ... {
 }
 @undef SZ_SUFFIX
 @undef SZ_BYTES
+@undef SZ_BITS
 
 
 
 # Some entries in the table only run once
+@define SZ_SUFFIX ""
+@define SZ_BYTES ""
+@define SZ_BITS ""
 @define ONCE
 @include "sized_include.sinc"
 @undef ONCE
+@undef SZ_SUFFIX
+@undef SZ_BYTES
+@undef SZ_BITS

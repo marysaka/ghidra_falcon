@@ -1,3 +1,8 @@
+macro todo_binop(dst, src1, src2) {
+  dst = todo(src1, src2);
+}
+
+
 macro store32(addr, value) {
   *[dram]:4 (addr) = value;
 }
@@ -49,6 +54,10 @@ macro setResultFlags(result) {
 }
 
 macro clear(dst) {
+  dst = 0;
+}
+
+macro mov(dst, src) {
   dst = 0;
 }
 

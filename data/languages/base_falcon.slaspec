@@ -143,6 +143,9 @@ addr16: imm16 is imm16 {
   export *:4 imm16;
 }
 
+define pcodeop todo;
+define pcodeop todo_flags;
+
 @include "macro.sinc"
 @include "unsized_inst.sinc"
 

@@ -5,10 +5,6 @@ define pcodeop io_write_sync;
 
 define pcodeop unkce_io_read;
 
-define pcodeop todo;
-define pcodeop todo_flags;
-
-
 define pcodeop vtlb;
 
 define pcodeop cmov;
