@@ -25,12 +25,23 @@ macro load8(dst1, addr) {
 macro xbit(dst1, src1, bit1) {
   dst1 = (src1 >> bit1) & 1;
 }
+
+macro op_sext(dst, src1, src2) {
+  #dst = (src1 << (32 - (src2 & 0x1F))) s>> (32 - (src2 & 0x1F));
+  local shift_distance = (31 - (src2 & 0x1F));
+  dst = (src1 << shift_distance) s>> shift_distance;
+}
+
 macro bclr(reg1, bit1) {
   reg1 = reg1 & ~(1 << bit1);
 }
 
 macro bset(reg1, bit1) {
   reg1 = reg1 | (1 << bit1);
+}
+
+macro btgl(reg1, bit1) {
+  reg1 = reg1 ^ (1 << bit1);
 }
 
 macro push32(val32) {
@@ -168,3 +179,5 @@ macro neg(dst, src) {
   setResultFlags(dst);
   $(O_flag) = sborrow(0, dst);
 }
+
+

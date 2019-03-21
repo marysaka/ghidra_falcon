@@ -460,7 +460,7 @@
 
 #	{ 0x000000c2, 0x000000ff, OP3B, N("sext"), REG2, REG1, IMM8 },
 :sext reg2, reg1, imm8 is raw_opcode=0xc2; reg2 & reg1; imm8 {
-  todo();
+  op_sext(reg2, reg1, imm8);
 }
 
 #	{ 0x000000c3, 0x000000ff, OP3B, N("extrs"), REG2, REG1, BITF8, .fmask = F_FUC3P },
@@ -494,6 +494,10 @@
 }
 
 #	{ 0x000000cc, 0x000000ff, OP3B, N("div"), REG2, REG1, IMM8, .fmask = F_FUC3P },
+:mod reg2, reg1, imm8 is raw_opcode=0xcc; reg2 & reg1; imm8 {
+  reg2 = reg1 / imm8;
+}
+
 #	{ 0x000000cd, 0x000000ff, OP3B, N("mod"), REG2, REG1, IMM8, .fmask = F_FUC3P },
 :mod reg2, reg1, imm8 is raw_opcode=0xcd; reg2 & reg1; imm8 {
   reg2 = reg1 % imm8;
@@ -559,8 +563,11 @@
 }
 
 #	{ 0x000000ec, 0x000000ff, OP4B, N("div"), REG2, REG1, IMM16, .fmask = F_FUC3P },
+:div reg2, reg1, imm16 is raw_opcode=0xec; reg2 & reg1; imm16 { reg2 = reg1 / imm16; }
+
 #	{ 0x000000ed, 0x000000ff, OP4B, N("mod"), REG2, REG1, IMM16, .fmask = F_FUC3P },
-# ? :mod reg2, reg1, imm16 is raw_opcode=0xed; reg2 & reg1; imm16 { reg2 = todo(reg1, imm16 :2); }
+:mod reg2, reg1, imm16 is raw_opcode=0xed; reg2 & reg1; imm16 { reg2 = reg1 % imm16; }
+
 #	{ 0x000000e0, 0x000000f0, OP4B, OOPS, REG2, REG1, IMM16 },
 #
 #	{ 0x000000f0, 0x00000ffe, T(ol0), N("mulu"), REG1, T(i) },
@@ -619,7 +626,7 @@
 
 #	{ 0x00000bf0, 0x00000fff, T(ol0), N("btgl"), REG1, T(i) },
 :btgl reg1, imm8 is raw_opcode=0xf0; subopcode2=0xb & reg1; imm8 {
-  todo();
+  btgl(reg1, imm8);
 }
 
 #	{ 0x00000cf0, 0x00000fff, T(ol0), N("xbit"), REG1, FLAGS, T(fl) },
@@ -937,6 +944,13 @@
 }
 
 #	{ 0x000004fb, 0x000007ff, OP3B, N("mpopadd"), REG1, IMM8S, .fmask = F_FUC5P },
+:mpopaddret reg1, imm8s is raw_opcode=0xFB; subopcodeb1_0_2=4 & reg1 ; imm8s {
+  # TODO: see mpop
+  pop32(reg1);
+  sp = sp + &reg1; # TODO: remove this horrible hack
+  sp = sp + imm8s;
+}
+
 #	{ 0x000005fb, 0x000007ff, OP3B, N("mpopaddret"), REG1, IMM8S, ENDMARK, .fmask = F_FUC5P },
 :mpopaddret reg1, imm8s is raw_opcode=0xFB; subopcodeb1_0_2=5 & reg1 ; imm8s {
   # TODO: see mpop
@@ -986,7 +1000,14 @@
 }
 
 #	{ 0x000a00fd, 0x000f00ff, OP3B, N("bclr"), REG1, REG2 },
+:bclr reg1, reg2 is raw_opcode=0xFD; reg2 & reg1; subopcode3=0xa {
+  bclr(reg1, (reg2 & 0x1F));
+}
+
 #	{ 0x000b00fd, 0x000f00ff, OP3B, N("btgl"), REG1, REG2 },
+:btgl reg1, reg2 is raw_opcode=0xFD; reg2 & reg1; subopcode3=0xd {
+  btgl(reg1, (reg2 & 0x1F));
+}
 #	{ 0x000000fd, 0x000000ff, OP3B, OOPS, REG1, REG2 },
 #
 #	{ 0x000000fe, 0x000f00ff, OP3B, N("mov"), SREG2, REG1 },
@@ -1000,12 +1021,20 @@
 }
 
 #	{ 0x000200fe, 0x000f00ff, OP3B, N("ptlb"), REG2, REG1, .fmask = F_FUC3P },
+:vtlb reg2, reg1 is raw_opcode=0xfe; reg2 & reg1; subopcode3=0x2 {
+  reg2 = ptlb(reg1);
+}
+
 #	{ 0x000300fe, 0x000f00ff, OP3B, N("vtlb"), REG2, REG1, .fmask = F_FUC3P },
 :vtlb reg2, reg1 is raw_opcode=0xfe; reg2 & reg1; subopcode3=0x3 {
   reg2 = vtlb(reg1);
 }
 
 #	{ 0x000c00fe, 0x000f00ff, OP3B, N("xbit"), REG2, FLAGS, REG1 },
+:xbit reg2, flags, reg1 is raw_opcode=0xfe; reg2 & reg1 & flags; subopcode3=0xc {
+  xbit(reg2, flags, reg1);
+}
+
 #	{ 0x000000fe, 0x000000ff, OP3B, OOPS, REG2, REG1 },
 #
 #	{ 0x000000ff, 0x000f00ff, OP3B, N("mulu"), REG3, REG1, REG2 },

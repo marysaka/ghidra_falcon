@@ -1,3 +1,9 @@
+# WARNING: This is a multiply-included header, see "sized.sinc".
+
+# Constructors in "@ifdef ONCE" are defined only once.
+# Constructors in "@ifndef ONCE" are defined three times, for b32, b16 and b8 variants,
+# these run in a "with" block that validates the "op_size" field.
+
 @ifdef ONCE
 #static struct insn tabsi[] = {
 #	{ 0x00000000, 0x0000003f, OP3B, N("st"), T(sz), T(datari), REG2, .fmask = F_FUCOLD },
@@ -497,9 +503,10 @@
   hswap8(reg1:1, reg1:1);
 }
 
-#	{ 0x0000043d, 0x00000f3f, OP2B, N("clear"), T(sz), REG1 },
 @endif
 @ifndef ONCE
+
+# { 0x0000043d, 0x00000f3f, OP2B, N("clear"), T(sz), REG1 },
 :clear^$(SZ_SUFFIX) reg1 is op_format=0x3D ; subopcode2=0x4 & reg1  {
   clear(reg1 :$(SZ_BYTES));
 }
@@ -516,17 +523,14 @@
 @endif # !ONCE
 @ifdef ONCE
 #	{ 0x0000003e, 0x000000ff, OP4B, N("lbra"), LLBTARG, .fmask = F_FUC4P },
-:lbra fimm24s is raw_opcode = 0x3E; fimm24s { # signed?
-  local tmp:4 = fimm24s;
-  goto [tmp];
+:lbra fimm24st is raw_opcode = 0x3E; fimm24st { # signed?
+  goto fimm24st;
 } 
 
 #	{ 0x0000007e, 0x000000ff, OP4B, N("lcall"), LLCTARG, .fmask = F_FUC4P },
-:lcall fimm24s is raw_opcode = 0x7E; fimm24s {
+:lcall fimm24st is raw_opcode = 0x7E; fimm24st {
   push32(&:4 inst_next);
-
-  local tmp:4 = fimm24s;
-  call [tmp];
+  call fimm24st;
 } 
 
 #	{ 0x000000be, 0x000000ff, OP4B, OOPS, FIMM24, .fmask = F_FUC4P },

@@ -143,6 +143,9 @@ addr16: imm16 is imm16 {
   export *:4 imm16;
 }
 
+fimm24st: target is fimm24s [ target = 0 + fimm24s; ] {
+  export *:4 target;
+}
 define pcodeop todo;
 define pcodeop todo_flags;
 
