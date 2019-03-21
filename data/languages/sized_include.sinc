@@ -34,8 +34,7 @@
 
 #	{ 0x00000011, 0x0000003f, OP3B, N("adc"), T(sz), REG2, REG1, IMM8 },
 :adc^$(SZ_SUFFIX) reg2, reg1, imm8 is op_format=0x11; reg2 & reg1; imm8 {
-  todo_binop(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8 :1);
-  #adc(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
+  adc(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
 }
 
 #	{ 0x00000012, 0x0000003f, OP3B, N("sub"), T(sz), REG2, REG1, IMM8 },
@@ -248,7 +247,7 @@
 
 #	{ 0x00000136, 0x00000f3e, T(ol0), N("adc"), T(sz), REG1, T(i) },
 :adc^$(SZ_SUFFIX) reg1, imm8 is op_format=0x36; subopcode2=0x1 & reg1; imm8 {
-  todo_binop(reg1:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8 :1);
+  adc(reg1:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
 }
 
 #	{ 0x00000236, 0x00000f3e, T(ol0), N("sub"), T(sz), REG1, T(i) },
@@ -305,7 +304,7 @@
 
 #	{ 0x0100000038, 0x0f0000003f, OP5B, N("adc"), T(sz), REG2, REG1, IMM16, .fmask = F_FUC5P },
 :adc^$(SZ_SUFFIX) reg2, reg1, imm16 is op_format=0x38; reg2 & reg1; imm16 ; subopcode5=0x1 {
-  todo_binop(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm16 :4);
+  adc(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES), imm16);
 }
 
 #	{ 0x0200000038, 0x0f0000003f, OP5B, N("sub"), T(sz), REG2, REG1, IMM16, .fmask = F_FUC5P },
@@ -345,7 +344,7 @@
 
 #	{ 0x0001003b, 0x000f003f, OP3B, N("adc"), T(sz), REG1, REG2 },
 :adc^$(SZ_SUFFIX) reg1, reg2 is op_format=0x3b; reg2 & reg1; subopcode3=0x1 {
-  todo_binop(reg1:$(SZ_BYTES), reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
+  adc(reg1:$(SZ_BYTES), reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
 }
 
 #	{ 0x0002003b, 0x000f003f, OP3B, N("sub"), T(sz), REG1, REG2 },
@@ -396,7 +395,7 @@
 
 #	{ 0x0001003c, 0x000f003f, OP3B, N("adc"), T(sz), REG3, REG1, REG2 },
 :adc^$(SZ_SUFFIX) reg3, reg1, reg2 is op_format=0x3c; reg2 & reg1; subopcode3=0x1 & reg3 {
-  todo_binop(reg3:$(SZ_BYTES), reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
+  adc(reg3:$(SZ_BYTES), reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
 }
 
 #	{ 0x0002003c, 0x000f003f, OP3B, N("sub"), T(sz), REG3, REG1, REG2 },

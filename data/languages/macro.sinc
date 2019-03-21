@@ -122,6 +122,20 @@ macro add(dst, src1, src2) {
   setResultFlags(dst);
 }
 
+
+macro adc(dst, src1, src2) {
+  # TODO: this assumes these flags match x86
+  local cf_copy = zext($(C_flag));
+  $(C_flag) = carry(src1, src2);
+  $(O_flag) = scarry(src1, src2);
+  local result = src1 + src2;
+  $(C_flag) = $(C_flag) || carry(result, cf_copy);
+  $(O_flag) = $(O_flag) ^^ scarry(result, cf_copy);
+  dst = result + cf_copy;
+  setResultFlags(dst);
+}
+
+
 macro sub(dst, src1, src2) {
   $(C_flag) = src1 < src2;
   $(O_flag) = sborrow(src1,src2);
