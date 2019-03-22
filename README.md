@@ -71,21 +71,27 @@ If you hit errors reloading, you can view the log by clicking the "Show Console"
 
 ## To-Do
 
-Personally I've avoided pre-emptively adding operations that I can't test/verify easily, because I'm sure I'd even more mistakes and not realise I hadn't verified things. It should be practical to generate a huge test file covering every instruction encoding with different operand values, and automatically compare the Ghidra and envydis output to finish the instruction decoding.
+Finish adding instructions and figure out how to do thorough automated testing.
+
+It should be practical to generate a huge test file covering every instruction encoding with different operand values, and automatically compare the Ghidra and envydis output to finish the instruction decoding.
+
+No idea how best to test the decompilation/pcode.
 
 Known issues/todo-list:
 
+* add other falcon variants
 * fix mpop/mpush (and variants) to read/write all values
-* finalize calling convention (what's the deal with r9 and r15?)
 * rename "ram" to "iram" and document adding a "dram" section for globals
 * try making "io" a real address space? might make naming easier
 * see if there's a way to make crypto stuff decompile as `csecret(c1, 0x2)` instead of `csecret(1, 2)`
 * global stores can be reordered to come after pcodeop calls that implicitly read from them (probably a ghidra bug?)
 * can we bundle types? I'm loading an enum with io address constants (e.g. `FALCON_MAILBOX1 = 0x1100`) to make reversing easier. ("io" address space and default names might be the right approach?)
-* split common flags into their own 1-byte registers (like the x86 backend does) to shrink pcode size and make it easier to read. (we'll need to add packflags and unpackflags anywhere the flags register is read and written respectively)
+* finish adding packflags and unpackflags anywhere the flags register is used directly. make "xbit" on condition flags just move the one register.
+* make the flags register actually show up when not just used for condition codes. writes to flags such as  "interrupt enable" don't show up in the decompiler.
 * update readme screenshot sometime - that function is looking a ton better already (https://imgur.com/KGQJebQ), but I want to try to get things stable first to avoid making the repo huge with png files
 
 ## Resources
 
-* https://envytools.readthedocs.io/en/latest/hw/falcon/index.html
-* https://switchbrew.org/wiki/TSEC
+* https://envytools.readthedocs.io/en/latest/hw/falcon/index.html - thorough hardware documentation
+* https://switchbrew.org/wiki/TSEC - crypt functionality
+* http://0x04.net/~mwk/Falcon.html - calling convention
