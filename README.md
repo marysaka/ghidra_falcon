@@ -69,6 +69,10 @@ Reload (with your `ReloadSleighLangauge.java` hotkey), disassemble the bytes (by
 
 If you hit errors reloading, you can view the log by clicking the "Show Console" icon at the bottom Ghidra project window (the one with the file listing, not the CodeBrowser/disassembly window). The errors are only helpful some of the time, so I usually check my changes by hand first to see if I can spot what I did wrong.
 
+### Syntax highlighting
+
+If you like syntax highlighting, Sleigh often looks okay highlighted as a bash script. I got tired of this and wrote a very basic sublime-syntax, which can be found at: https://github.com/hthh/sleigh-sublime-syntax
+
 ## To-Do
 
 Finish adding instructions and figure out how to do thorough automated testing.
