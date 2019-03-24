@@ -186,23 +186,24 @@
 }
 
 #	{ 0x00000530, 0x00000f3e, T(ol0), N("cmps"), T(sz), REG1, T(is) },
-:cmps^$(SZ_SUFFIX) reg1, imm8 is op_format=0x30; subopcode2=0x5 & reg1 ; imm8 {
-  cmps(reg1:$(SZ_BYTES), imm8);
+:cmps^$(SZ_SUFFIX) reg1, imm8s is op_format=0x30; subopcode2=0x5 & reg1 ; imm8s {
+  cmps(reg1:$(SZ_BYTES), imm8s);
 }
-:cmps^$(SZ_SUFFIX) reg1, imm16 is op_format=0x31; subopcode2=0x5 & reg1 ; imm16 {
-  cmps(reg1:$(SZ_BYTES), imm16);
+:cmps^$(SZ_SUFFIX) reg1, imm16s is op_format=0x31; subopcode2=0x5 & reg1 ; imm16s {
+  cmps(reg1:$(SZ_BYTES), imm16s);
 }
 
 #	{ 0x00000630, 0x00000f3e, T(ol0), N("cmp"), T(sz), REG1, T(is), .fmask = F_FUC3P },
-:cmp^$(SZ_SUFFIX) reg1, imm8 is op_format=0x30; subopcode2=0x6 & reg1 ; imm8 {
-  cmp(reg1:$(SZ_BYTES), imm8);
+:cmp^$(SZ_SUFFIX) reg1, imm8s is op_format=0x30; subopcode2=0x6 & reg1 ; imm8s {
+  cmp(reg1:$(SZ_BYTES), imm8s);
 }
-:cmp^$(SZ_SUFFIX) reg1, imm16 is op_format=0x31; subopcode2=0x6 & reg1 ; imm16 {
-  cmp(reg1:$(SZ_BYTES), imm16);
+:cmp^$(SZ_SUFFIX) reg1, imm16s is op_format=0x31; subopcode2=0x6 & reg1 ; imm16s {
+  cmp(reg1:$(SZ_BYTES), imm16s);
 }
 
 #	{ 0x00000030, 0x0000003e, T(ol0), OOPS, T(sz), REG1, T(i) },
 #
+@if defined(SUPPORT_FUC5P)
 #	{ 0x00000032, 0x0000003f, OP2B, N("mov"), T(sz), REG2, REG1, .fmask = F_FUC5P },
 :mov^$(SZ_SUFFIX) reg2, reg1 is op_format=0x32; reg2 & reg1 {
   mov(reg2:$(SZ_BYTES), reg1:$(SZ_BYTES));
@@ -249,7 +250,7 @@
 :bra^$(SZ_SUFFIX) reg1, imm16, "ne", rel16 is op_format=0x33; subopcode2=0xf & reg1; imm16; rel16 {
   if ((reg1:$(SZ_BYTES)) != imm16) goto rel16;
 }
-
+@endif
 #
 #	{ 0x00000034, 0x00000f3f, OP3B, N("ld"), T(sz), REG1, T(datasp) },
 :ld^$(SZ_SUFFIX) reg1, "D"^[sp + offset] is op_format=0x34; subopcode2=0x0 & reg1 & sp ; imm8 [ offset=imm8 * $(SZ_BYTES); ] {
@@ -265,6 +266,8 @@
 
 #	{ 0x00000034, 0x0000003f, OP3B, OOPS, T(sz), REG1, IMM8 },
 #
+
+@if defined(SUPPORT_FUC5P)
 #	{ 0x00000035, 0x0000003f, OP3B, N("st"), T(sz), T(datari), REG2, .fmask = F_FUC5P },
 :st^$(SZ_SUFFIX) "D"^[reg1 + offset], reg2 is op_format=0x35; reg2 & reg1; imm8 [ offset=imm8 * $(SZ_BYTES); ] {
 @if SZ_BITS == "32"
@@ -276,6 +279,7 @@
 @endif
     (reg1 + offset, reg2);
 }
+@endif
 
 #
 #	{ 0x00000036, 0x00000f3e, T(ol0), N("add"), T(sz), REG1, T(i) },
@@ -294,6 +298,9 @@
 #	{ 0x00000236, 0x00000f3e, T(ol0), N("sub"), T(sz), REG1, T(i) },
 :sub^$(SZ_SUFFIX) reg1, imm8 is op_format=0x36; subopcode2=0x2 & reg1; imm8 {
   sub(reg1:$(SZ_BYTES), reg1:$(SZ_BYTES), imm8);
+}
+:sub^$(SZ_SUFFIX) reg1, imm16 is op_format=0x37; subopcode2=0x2 & reg1; imm16 {
+  sub(reg1:$(SZ_BYTES), reg1:$(SZ_BYTES), imm16);
 }
 
 #	{ 0x00000336, 0x00000f3e, T(ol0), N("sbb"), T(sz), REG1, T(i) },
@@ -333,6 +340,18 @@
 #
 @if defined(SUPPORT_FUCOLD)
 #	{ 0x00000038, 0x000f003f, OP3B, N("st"), T(sz), DATAR, REG2, .fmask = F_FUCOLD },
+:st^$(SZ_SUFFIX) "D"^[reg1], reg2 is op_format=0x38; reg2 & reg1; subopcode3=0x0 {
+@if SZ_BITS == "32"
+  store32
+@elif SZ_BITS == "16"
+  store16
+@elif SZ_BITS == "8"
+  store8
+@endif
+    (reg1, reg2);
+}
+
+
 #	{ 0x00010038, 0x000f003f, OP3B, N("st"), T(sz), T(dataspr), REG1, .fmask = F_FUCOLD },
 #	{ 0x00040038, 0x000f003f, OP3B, N("cmpu"), T(sz), REG1, REG2, .fmask = F_FUCOLD },
 :cmpu^$(SZ_SUFFIX) reg1, reg2 is op_format=0x38; reg2 & reg1; subopcode3=0x4 {
@@ -340,7 +359,15 @@
 }
 
 #	{ 0x00050038, 0x000f003f, OP3B, N("cmps"), T(sz), REG1, REG2, .fmask = F_FUCOLD },
+:cmps^$(SZ_SUFFIX) reg1, reg2 is op_format=0x38; reg2 & reg1; subopcode3=0x5 {
+  cmps(reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
+}
+
 #	{ 0x00060038, 0x000f003f, OP3B, N("cmp"), T(sz), REG1, REG2, .fmask = F_FUC3P | F_FUCOLD },
+:cmp^$(SZ_SUFFIX) reg1, reg2 is op_format=0x38; reg2 & reg1; subopcode3=0x6 {
+  cmp(reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
+}
+
 #	{ 0x00000038, 0x0000003f, OP3B, OOPS, T(sz), REG1, REG2, .fmask = F_FUCOLD },
 @endif
 #
@@ -380,7 +407,14 @@
 }
 
 #	{ 0x00020039, 0x000f003f, OP3B, N("movf"), T(sz), REG2, REG1, .fmask = F_FUC0 },
+
+@if defined(SUPPORT_FUCOLD)
 #	{ 0x00020039, 0x000f003f, OP3B, N("mov"), T(sz), REG2, REG1, .fmask = F_FUC3P | F_FUCOLD },
+:mov^$(SZ_SUFFIX) reg1, reg2 is op_format=0x39; reg2 & reg1; subopcode3=0x2 {
+  mov(reg1:$(SZ_BYTES), reg2:$(SZ_BYTES));
+}
+@endif
+
 #	{ 0x00030039, 0x000f003f, OP3B, N("hswap"), T(sz), REG2, REG1 },
 #	{ 0x00000039, 0x0000003f, OP3B, OOPS, T(sz), REG2, REG1 },
 #
@@ -487,6 +521,7 @@
     (reg3:$(SZ_BYTES), reg1 + reg2*$(SZ_BYTES));
 }
 
+@if defined(SUPPORT_FUC5P)
 #	{ 0x0009003c, 0x000f003f, OP3B, N("st"), T(sz), T(datarralt), REG2, .fmask = F_FUC5P },
 :st^$(SZ_SUFFIX) "D"^[reg1 + reg3*$(SZ_BYTES)], reg2 is op_format=0x3c; reg1 & reg2 ; subopcode3=0x9 & reg3 {
 @if SZ_BITS == "32"
@@ -498,6 +533,7 @@
 @endif
     (reg1 + reg3*$(SZ_BYTES), reg2);
 }
+@endif
 
 #	{ 0x000c003c, 0x000f003f, OP3B, N("shlc"), T(sz), REG3, REG1, REG2 },
 :shlc^$(SZ_SUFFIX) reg3, reg1, reg2 is op_format=0x3c; reg2 & reg1; subopcode3=0xc & reg3 {
@@ -588,6 +624,7 @@
 @endif
 @ifndef ONCE
 
+@if defined(SUPPORT_FUC5P)
 #	{ 0x0000003f, 0x0000003f, OP2B, N("ld"), T(sz), REG2, DATAR, .fmask = F_FUC5P },
 :ld^$(SZ_SUFFIX) reg2, "D"^[reg1] is op_format=0x3F; reg2 & reg1  {
 @if SZ_BITS == "32"
@@ -599,6 +636,7 @@
 @endif
     (reg2:$(SZ_BYTES), reg1);
 }
+@endif
 
 #
 #	{ 0, 0, OOPS, T(sz) },

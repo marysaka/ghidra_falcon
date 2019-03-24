@@ -519,10 +519,12 @@
 #	{ 0x000000d1, 0x000000ff, OP3B, N("iowrs"), IORI, REG2, .fmask = F_FUC3P | F_FUCOLD },
 #	{ 0x000000d0, 0x000000f0, OP3B, OOPS, REG1, REG2, IMM8, .fmask = F_FUCOLD },
 #
+@if defined(SUPPORT_FUC5P)
 #	{ 0x000000d0, 0x000000f0, OP5B, N("mov"), REG0, FIMM32, .fmask = F_FUC5P },
 :mov reg0, fimm32 is raw_opcode_hi=0xd & reg0; fimm32 {
  reg0 = fimm32;
 }
+@endif
 
 #
 #	{ 0x000000e0, 0x000000ff, OP4B, N("mulu"), REG2, REG1, IMM16 },
@@ -614,11 +616,11 @@
 
 #	{ 0x000007f0, 0x00000ffe, T(ol0), N("mov"), REG1, T(is), .fmask = F_FUCOLD },
 @if defined(SUPPORT_FUCOLD)
-:mov reg1, imm8 is raw_opcode=0xf0; subopcode2=0x7 & reg1; imm8 {
-  mov(reg1, imm8);
+:mov reg1, imm8s is raw_opcode=0xf0; subopcode2=0x7 & reg1; imm8s {
+  mov(reg1, imm8s);
 }
-:mov reg1, imm16 is raw_opcode=0xf1; subopcode2=0x7 & reg1; imm16 {
-  mov(reg1, imm16);
+:mov reg1, imm16s is raw_opcode=0xf1; subopcode2=0x7 & reg1; imm16s {
+  mov(reg1, imm16s);
 }
 @endif
 
@@ -652,6 +654,11 @@
 #	{ 0x000000f0, 0x000000fe, T(ol0), OOPS, REG1, T(i) },
 #
 #	{ 0x000008f2, 0x00000fff, OP3B, N("setp"), T(fl), REG1 },
+:setp imm8, reg1 is raw_opcode=0xf2; subopcode2=0x8 & reg1; imm8 {
+  flags = flags & ~(1 << imm8);
+  flags = flags | ((reg1 & 1) << imm8);
+}
+
 #	/* The indirect crypt opcodes.
 #	 *
 #	 * For one-reg opcodes, the crypt register to use is selected by
@@ -765,15 +772,21 @@
 #	{ 0x00000cf2, 0x00000fff, OP3B, OOPS, REG1, .fmask = F_CRYPT },
 #	{ 0x000000f2, 0x000000ff, OP3B, OOPS, REG1, IMM8 },
 #
+@if defined(SUPPORT_FUC5P)
 #	{ 0x000000f3, 0x000000ff, OP3B, N("call"), FCTARG, .fmask = F_FUC5P },
 :call addr16 is raw_opcode=0xf3; addr16 {
   push32(&:4 inst_next);
   call addr16;
 }
+@endif
 
 #
 #	{ 0x000000f4, 0x000020fe, T(ol0), N("bra"), T(p), T(bt) },
 #	{ 0x000020f4, 0x00003ffe, T(ol0), N("bra"), T(abt), ENDMARK },
+:bra addr16 is raw_opcode=0xf5; subopcodeb1_0_7=0x20; addr16 {
+  goto addr16;
+}
+
 #	{ 0x000021f4, 0x00003fff, T(ol0), N("call"), T(ct) },
 #	{ 0x000021f5, 0x00003fff, T(ol0), N("call"), T(ct), .fmask = F_FUCOLD },
 @if defined(SUPPORT_FUCOLD)
@@ -798,6 +811,14 @@
 }
 
 #	{ 0x000031f4, 0x00003fff, T(ol0), N("bset"), FLAGS, T(fl) },
+:bset flags, "ie0" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & flags ; imm8=0x10 {
+  __set_flag_ie0();
+  flags[0x10, 1] = 1;
+}
+:bset flags, "ie1" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & flags ; imm8=0x11 {
+  __set_flag_ie1();
+  flags[0x11, 1] = 1;
+}
 :bset flags, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & flags ; imm8 {
   # TODO: display flag name
   packflags(flags);
@@ -806,6 +827,15 @@
 }
 
 #	{ 0x000032f4, 0x00003fff, T(ol0), N("bclr"), FLAGS, T(fl) },
+:bclr flags, "ie0" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & flags ; imm8=0x10 {
+  __clear_flag_ie0();
+  flags[0x10, 1] = 0;
+}
+:bclr flags, "ie1" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & flags ; imm8=0x11 {
+  __clear_flag_ie1();
+  flags[0x11, 1] = 0;
+}
+
 :bclr flags, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & flags ; imm8 {
   # TODO: display flag name
   packflags(flags);
@@ -829,6 +859,7 @@
 #	{ 0x00003cf5, 0x00003fff, T(ol0), T(cocmd), .fmask = F_CRYPT },
 #	{ 0x000000f4, 0x000000fe, T(ol0), OOPS, T(i) },
 #
+@if defined(SUPPORT_FUC5P)
 #	{ 0x000000f6, 0x000000ff, OP3B, N("iowr"), IORI, REG2, .fmask = F_FUC5P },
 :iowr [reg1^"+"^offset], reg2 is raw_opcode=0xf6; reg2 & reg1; imm8 [ offset=imm8 * 4; ] {
   io_write(reg1 + offset, reg2);
@@ -838,6 +869,7 @@
 :iowrs [reg1^"+"^offset], reg2 is raw_opcode=0xf7; reg2 & reg1; imm8 [ offset=imm8 * 4; ] {
   io_write_sync(reg1+offset, reg2);
 }
+@endif
 
 #
 #	{ 0x000000f8, 0x00000fff, OP2B, N("ret"), ENDMARK },
@@ -882,6 +914,7 @@
 }
 
 #	{ 0x000001f9, 0x00000fff, OP2B, N("add"), SP, REG1 },
+@if defined(SUPPORT_FUC5P)
 #	/* Display these in a better way, perhaps? */
 #	{ 0x000002f9, 0x00000fff, OP2B, N("mpush"), REG1, .fmask = F_FUC5P },
 :mpush reg1 is raw_opcode=0xf9; subopcode2=0x2 & reg1 {
@@ -890,6 +923,7 @@
   sp = sp - &reg1; # TODO: remove this horrible hack
   push32(reg1);
 }
+@endif
 
 #	{ 0x000004f9, 0x00000fff, OP2B, N("bra"), REG1 },
 :bra reg1 is raw_opcode=0xf9; subopcode2=0x4 & reg1 {
@@ -966,6 +1000,7 @@
 #	{ 0x000000fa, 0x000000ff, OP3B, OOPS, REG1, REG2 },
 #
 #	/* Display these in a better way, perhaps? */
+@if defined(SUPPORT_FUC5P)
 #	{ 0x000000fb, 0x000007ff, OP2B, N("mpop"), REG1, .fmask = F_FUC5P },
 :mpop reg1 is raw_opcode=0xFB; subopcodeb1_0_2=0 & reg1 {
   # TODO: I'm guessing if reg1 == 3 it pops r0, r1, r2, and r3, etc.
@@ -1008,6 +1043,7 @@
   sp = sp + imm8s;
   ret();
 }
+@endif
 
 #
 #	{ 0x000000fc, 0x00000fff, OP2B, N("pop"), REG1 },
