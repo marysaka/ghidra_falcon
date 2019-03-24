@@ -48,18 +48,18 @@
     <description>Nvidia Falcon v3</description>
     <compiler name="default" spec="falcon.cspec" id="default"/>
   </language>
+  <!-->
    <language processor="Falcon"
             endian="little"
             size="32"
             variant="v4"
             version="1.0"
-            slafile="falcon.sla"
-            processorspec="falcon_v4.pspec"
+            slafile="falcon_v4.sla"
+            processorspec="falcon.pspec"
             id="falcon:LE:32:v4">
     <description>Nvidia Falcon v4</description>
     <compiler name="default" spec="falcon.cspec" id="default"/>
   </language>
-  <!-->
    <language processor="Falcon"
             endian="little"
             size="32"

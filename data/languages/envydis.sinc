@@ -613,7 +613,19 @@
 :xor reg1, imm16 is raw_opcode=0xf1; subopcode2=0x6 & reg1; imm16 { xor(reg1, reg1, imm16); }
 
 #	{ 0x000007f0, 0x00000ffe, T(ol0), N("mov"), REG1, T(is), .fmask = F_FUCOLD },
+@if defined(SUPPORT_FUCOLD)
+:mov reg1, imm8 is raw_opcode=0xf0; subopcode2=0x7 & reg1; imm8 {
+  mov(reg1, imm8);
+}
+:mov reg1, imm16 is raw_opcode=0xf1; subopcode2=0x7 & reg1; imm16 {
+  mov(reg1, imm16);
+}
+@endif
+
+# shadowed by previous (?)
 #	{ 0x000007f1, 0x00000fff, T(ol0), N("movw"), REG1, IMM16W, .fmask = F_FUCOLD },
+
+
 #	{ 0x000009f0, 0x00000fff, T(ol0), N("bset"), REG1, T(i) },
 :bset reg1, imm8 is raw_opcode=0xf0; subopcode2=0x9 & reg1; imm8 {
   bset(reg1, imm8);
@@ -764,6 +776,13 @@
 #	{ 0x000020f4, 0x00003ffe, T(ol0), N("bra"), T(abt), ENDMARK },
 #	{ 0x000021f4, 0x00003fff, T(ol0), N("call"), T(ct) },
 #	{ 0x000021f5, 0x00003fff, T(ol0), N("call"), T(ct), .fmask = F_FUCOLD },
+@if defined(SUPPORT_FUCOLD)
+:call addr16 is raw_opcode=0xf5; subopcodeb1_0_7=0x21; addr16 {
+  push32(&:4 inst_next);
+  call addr16;
+}
+@endif
+
 #	{ 0x000028f4, 0x00003fff, T(ol0), N("sleep"), T(fl) }, /* sleeps while given flag is true */
 :sleep imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x28 ; imm8 {
   # TODO: display flag name
