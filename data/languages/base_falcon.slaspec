@@ -131,7 +131,7 @@ define token opcode_immediate16 (16)
 
 define token opcode_immediate24 (24)
   fimm24s=(0, 23) signed
-  fimm24=(0, 24)
+  fimm24=(0, 23)
 ;
 
 define token opcode_immediate32 (32)
