@@ -7,13 +7,14 @@ define space ram type=ram_space size=4 default;
 define space dram type=ram_space size=4;
 define space register type=register_space size=4;
 
-# gpr
+# general-purpose registers
 define register offset=0 size=4 [
   r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15
 ];
 
+# special-purpose registers
 define register offset=0x40 size=4 [
-  iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus
+  iv0 iv1 iv2 ev sp pc imb dmb csw ccr sec ctx exci sec1 imb1 dmb1
 ];
 
 # unpacked flags
@@ -147,7 +148,7 @@ attach variables [ reg0 reg1 reg2 reg3 ]
 
 attach variables [ sreg1 sreg2 ]
 [
-  iv0 iv1 _ tv sp pc xcbase xdbase flags cx cauth xtargets tstatus _ _ _
+  iv0 iv1 iv2 ev sp pc imb dmb csw ccr sec ctx exci sec1 imb1 dmb1
 ];
 
 attach names [ creg1 creg2 ]
