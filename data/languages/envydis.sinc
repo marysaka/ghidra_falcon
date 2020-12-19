@@ -69,7 +69,7 @@
 #	{ 5, "pc" },
 #	{ 6, "xcbase" },
 #	{ 7, "xdbase" },
-#	{ 8, "flags" },
+#	{ 8, "csw" },
 #	{ 9, "cx", .fmask = F_CRYPT },
 #	{ 0xa, "cauth", .fmask = F_CRYPT },
 #	{ 0xb, "xtargets" },
@@ -95,7 +95,7 @@
 #static struct reg sreg1_r = { &reg1_bf, "s", .specials = sreg_sr, .always_special = 1 };
 #static struct reg sreg2_r = { &reg2_bf, "s", .specials = sreg_sr, .always_special = 1 };
 #static struct reg sp_r = { 0, "sp", .cool = 1 };
-#static struct reg flags_r = { 0, "flags", .cool = 1 };
+#static struct reg csw_r = { 0, "csw", .cool = 1 };
 ##define REG0 atomreg, &reg0_r
 ##define REG1 atomreg, &reg1_r
 ##define REG2 atomreg, &reg2_r
@@ -107,7 +107,7 @@
 ##define SREG1 atomreg, &sreg1_r
 ##define SREG2 atomreg, &sreg2_r
 ##define SP atomreg, &sp_r
-##define FLAGS atomreg, &flags_r
+##define csw atomreg, &csw_r
 #
 #/*
 # * Immediate fields
@@ -250,146 +250,6 @@
 #F(ct, 0, SCTARG, LCTARG);
 #F(ol0, 0, OP3B, OP4B);
 #
-#static struct insn tabcocmd[] = {
-#	{ 0x00000000, 0x80000000, N("cxset"), IMM8 },
-#	{ 0x84000000, 0xfc000000, N("cmov"), CREG1, CREG2 },
-:cmov creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0x84 >> 2) {
-  cmov(creg1 :4, creg2 :4);
-}
-
-#	/* pull 16 bytes from crypt xfer stream */
-#	{ 0x88000000, 0xfc000000, N("cxsin"), CREG1 },
-:cxsin creg1 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & subopcode_crypt=(0x88 >> 2) {
-  cxsin(creg1 :4);
-}
-
-#	/* send 16 bytes to crypt xfer stream */
-#	{ 0x8c000000, 0xfc000000, N("cxsout"), CREG1 },
-:cxsout creg1 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & subopcode_crypt=(0x8c >> 2) {
-  cxsout(creg1 :4);
-}
-
-#	/* next ARG coprocessor instructions are stored as a "script" to be executed later. */
-#	{ 0x94000000, 0xfc000000, N("cs0begin"), CIMM2 },
-:cs0begin cimm2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; cimm2 & subopcode_crypt=(0x94 >> 2) {
-  cs0begin(cimm2 :4);
-}
-
-#	/* the script stored by previous insn is executed ARG times. */
-#	{ 0x98000000, 0xfc000000, N("cs0exec"), CIMM2 },
-:cs0exec cimm2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; cimm2 & subopcode_crypt=(0x98 >> 2) {
-  cs0exec(cimm2 :4);
-}
-
-#	/* like above, but operates on another script slot */
-#	{ 0x9c000000, 0xfc000000, N("cs1begin"), CIMM2 },
-:cs1begin cimm2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; cimm2 & subopcode_crypt=(0x9C >> 2) {
-  cs1begin(cimm2 :4);
-}
-
-#	{ 0xa0000000, 0xfc000000, N("cs1exec"), CIMM2 },
-:cs1exec cimm2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; cimm2 & subopcode_crypt=(0xA0 >> 2) {
-  cs1exec(cimm2 :4);
-}
-
-#	{ 0xac000000, 0xfc000000, N("cxor"), CREG1, CREG2 },
-:cxor creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xAC >> 2) {
-  cxor(creg1 :4, creg2 :4);
-}
-
-#	{ 0xb0000000, 0xfc000000, N("cadd"), CREG1, CIMM2 }, /* add immediate to register, modulo 2^64 */
-:cadd creg1, cimm2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & cimm2 & subopcode_crypt=(0xB0 >> 2) {
-  cadd(creg1 :4, cimm2 :4);
-}
-
-#	{ 0xb4000000, 0xfc000000, N("cand"), CREG1, CREG2 },
-:cand creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xb4 >> 2) {
-  cand(creg1 :4, creg2 :4);
-}
-
-#	{ 0xb8000000, 0xfc000000, N("crev"), CREG1, CREG2 }, /* reverse bytes */
-:crev creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xb8 >> 2) {
-  crev(creg1 :4, creg2 :4);
-}
-
-#	{ 0xbc000000, 0xfc000000, N("cprecmac"), CREG1, CREG2 }, /* shift left by 1. if bit shifted out the left side was set, xor with 0x87. */
-# @hthh if you do anything, rename cprecmac to cgfmul
-:cgfmul creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xbc >> 2) {
-  cgfmul(creg1 :4, creg2 :4);
-}
-
-#	/* Load selected secret to register. The register is subsequently
-#	 * marked "hidden", and all attempts to xfer stuff from it by
-#	 * non-authed code will result in just getting 0s. The hidden flag
-#	 * also propagates through all normal crypto ops to destination reg,
-#	 * so there's basically no way to get information out of hidden
-#	 * registers, other than via authed code. */
-#	{ 0xc0000000, 0xfc000000, N("csecret"), CREG1, CIMM2 },
-:csecret creg1, cimm2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & cimm2 & subopcode_crypt=(0xC0 >> 2) {
-  csecret(creg1 :4, cimm2 :4);
-}
-
-#	/* Binds a register as the key for enc/dec operations. A *register*,
-#	 * not its contents. So if you bind $c3, then change its value,
-#	 * it'll use the new value.
-#	 */
-#	{ 0xc4000000, 0xfc000000, N("ckeyreg"), CREG1 },
-:ckeyreg creg1 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & subopcode_crypt=(0xc4 >> 2) {
-  ckeyreg(creg1 :4);
-}
-
-#	/* key expansion - go through AES key schedule given the key [aka
-#	 * first 16 bytes of 176-byte expanded key], return last 16 bytes
-#	 * of the expended key. Used to get decryption keys.
-#	 */
-#	{ 0xc8000000, 0xfc000000, N("ckexp"), CREG1, CREG2 },
-:ckexp creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xc8 >> 2) {
-  ckexp(creg1 :4, creg2 :4);
-}
-
-#	/* reverse operation to the above - get the original key given
-#	 * last 16 bytes of the expanded key*/
-#	{ 0xcc000000, 0xfc000000, N("ckrexp"), CREG1, CREG2 },
-:ckrexp creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xcc >> 2) {
-  ckrexp(creg1 :4, creg2 :4);
-}
-
-#	/* encrypts a block using "key" register value as key */
-#	{ 0xd0000000, 0xfc000000, N("cenc"), CREG1, CREG2 },
-:cenc creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xd0 >> 2) {
-  cenc(creg1 :4, creg2 :4);
-}
-
-#	/* decrypts a block using "key" register value as last 16 bytes of
-#	 * expanded key - ie. you need to stuff the key through ckexp before
-#	 * use for decryption. */
-#	{ 0xd4000000, 0xfc000000, N("cdec"), CREG1, CREG2 },
-:cdec creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xd4 >> 2) {
-  cdec(creg1 :4, creg2 :4);
-}
-
-#	/* auth only: encrypt code sig with ARG2 as key */
-# { 0xdc000000, 0xfc000000, N("csigenc"), CREG1, CREG2 },
-:csigenc creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & creg2 & subopcode_crypt=(0xdc >> 2) {
-  csigenc(creg1 :4, creg2 :4);
-}
-
-# { 0xe0000000, 0xfc000000, N("csigclr"), ??? },
-:csigclr is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; cunk1 & cunk2 & subopcode_crypt=(0xe0 >> 2) {
-  csigclr();
-}
-
-:crnd creg1 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & subopcode_crypt=(0x90 >> 2) {
-  crnd(creg1 :4);
-}
-
-:cchmod creg1, cimm2 is raw_opcode=0xF5; subopcodeb1_0_7 = 0x3c; creg1 & cimm2 & subopcode_crypt=(0xA8 >> 2) {
-  cchmod(creg1 :4, cimm2 :4);
-}
-
-# cchmod
-# 00000000: f5 3c XY a8 cchmod $cY 0X or 00000000: f5 3c XY a9 cchmod $cY 1X
-# This instruction takes a crypto register and a 5 bit immediate value which represents the ACL mask to set.
 
 
 
@@ -643,130 +503,20 @@
   btgl(reg1, imm8);
 }
 
-#	{ 0x00000cf0, 0x00000fff, T(ol0), N("xbit"), REG1, FLAGS, T(fl) },
-:xbit reg1, flags, imm8 is raw_opcode=0xf0; subopcode2=0xC & reg1 & flags; imm8 {
+#	{ 0x00000cf0, 0x00000fff, T(ol0), N("xbit"), REG1, csw, T(fl) },
+:xbit reg1, csw, imm8 is raw_opcode=0xf0; subopcode2=0xC & reg1 & csw; imm8 {
   # TODO: display flag name
-  packflags(flags);
-  xbit(reg1, flags, imm8);
-  unpackflags(flags);
+  packflags(csw);
+  xbit(reg1, csw, imm8);
+  unpackflags(csw);
 }
 
 #	{ 0x000000f0, 0x000000fe, T(ol0), OOPS, REG1, T(i) },
 #
 #	{ 0x000008f2, 0x00000fff, OP3B, N("setp"), T(fl), REG1 },
 :setp imm8, reg1 is raw_opcode=0xf2; subopcode2=0x8 & reg1; imm8 {
-  flags = flags & ~(1 << imm8);
-  flags = flags | ((reg1 & 1) << imm8);
-}
-
-#	/* The indirect crypt opcodes.
-#	 *
-#	 * For one-reg opcodes, the crypt register to use is selected by
-#	 * bits 8-10 of the operand. For two-reg opcodes, destination is in
-#	 * bits 8-10, source in 0-2. For reg, imm opcodes, reg is in
-#	 * bits 8-10, immediate in 0-5. For imm-only opcodes, immediate is in
-#	 * bits 0-5.
-#	 *
-#	 * Or, in other words, the insn is converted into f5/3c op as follows:
-#	 *
-#	 *  bits 0-3: bits 8-11 of reg operand
-#	 *  bits 4-9: bits 0-5 of reg operand
-#	 *  bits 10-14: bits 0-4 of immediate byte
-#	 *  bit 15: always set.
-#	 */
-#	{ 0x00010cf2, 0x001f0fff, OP3B, N("cimov"), REG1, .fmask = F_CRYPT },
-:cimov reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x01 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00020cf2, 0x001f0fff, OP3B, N("cixsin"), REG1, .fmask = F_CRYPT },
-:cixsin reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x02 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00030cf2, 0x001f0fff, OP3B, N("cixsout"), REG1, .fmask = F_CRYPT },
-:cixsout reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x03 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00050cf2, 0x001f0fff, OP3B, N("cis0begin"), REG1, .fmask = F_CRYPT },
-:cis0begin reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x05 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00060cf2, 0x001f0fff, OP3B, N("cis0exec"), REG1, .fmask = F_CRYPT },
-:cis0exec reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x06 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00070cf2, 0x001f0fff, OP3B, N("cis1begin"), REG1, .fmask = F_CRYPT },
-:cis1begin reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x07 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00080cf2, 0x001f0fff, OP3B, N("cis1exec"), REG1, .fmask = F_CRYPT },
-:cis1exec reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x08 {
-  todo(reg1 :4);
-}
-
-#	{ 0x000b0cf2, 0x001f0fff, OP3B, N("cixor"), REG1, .fmask = F_CRYPT },
-:cixor reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0b {
-  todo(reg1 :4);
-}
-
-#	{ 0x000c0cf2, 0x001f0fff, OP3B, N("ciadd"), REG1, .fmask = F_CRYPT },
-:ciadd reg1 is raw_opcode=0xf2; subopcode2=0xC & reg1; subopcode_crypti=0x0c {
-  todo(reg1 :4);
-}
-
-#	{ 0x000d0cf2, 0x001f0fff, OP3B, N("ciand"), REG1, .fmask = F_CRYPT },
-:ciand reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0d {
-  todo(reg1 :4);
-}
-
-#	{ 0x000e0cf2, 0x001f0fff, OP3B, N("cirev"), REG1, .fmask = F_CRYPT },
-:cirev reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0e {
-  todo(reg1 :4);
-}
-
-#	{ 0x000f0cf2, 0x001f0fff, OP3B, N("ciprecmac"), REG1, .fmask = F_CRYPT },
-:ciprecmac reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0f {
-  todo(reg1 :4);
-}
-
-#	{ 0x00100cf2, 0x001f0fff, OP3B, N("cisecret"), REG1, .fmask = F_CRYPT },
-:cisecret reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x10 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00110cf2, 0x001f0fff, OP3B, N("cikeyreg"), REG1, .fmask = F_CRYPT },
-:cikeyreg reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x11 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00120cf2, 0x001f0fff, OP3B, N("cikexp"), REG1, .fmask = F_CRYPT },
-:cikexp reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x12 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00130cf2, 0x001f0fff, OP3B, N("cikrexp"), REG1, .fmask = F_CRYPT },
-:cikrexp reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x13 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00140cf2, 0x001f0fff, OP3B, N("cienc"), REG1, .fmask = F_CRYPT },
-:cienc reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x14 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00150cf2, 0x001f0fff, OP3B, N("cidec"), REG1, .fmask = F_CRYPT },
-:cidec reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x15 {
-  todo(reg1 :4);
-}
-
-#	{ 0x00170cf2, 0x001f0fff, OP3B, N("cisigenc"), REG1, .fmask = F_CRYPT },
-:cisigenc reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x17 {
-  todo(reg1 :4);
+  csw = csw & ~(1 << imm8);
+  csw = csw | ((reg1 & 1) << imm8);
 }
 
 #	{ 0x00000cf2, 0x00000fff, OP3B, OOPS, REG1, .fmask = F_CRYPT },
@@ -810,45 +560,45 @@
   add(sp, sp, imm16s);
 }
 
-#	{ 0x000031f4, 0x00003fff, T(ol0), N("bset"), FLAGS, T(fl) },
-:bset flags, "ie0" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & flags ; imm8=0x10 {
+#	{ 0x000031f4, 0x00003fff, T(ol0), N("bset"), csw, T(fl) },
+:bset csw, "ie0" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & csw ; imm8=0x10 {
   __set_flag_ie0();
-  flags[0x10, 1] = 1;
+  csw[0x10, 1] = 1;
 }
-:bset flags, "ie1" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & flags ; imm8=0x11 {
+:bset csw, "ie1" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & csw ; imm8=0x11 {
   __set_flag_ie1();
-  flags[0x11, 1] = 1;
+  csw[0x11, 1] = 1;
 }
-:bset flags, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & flags ; imm8 {
+:bset csw, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x31 & csw ; imm8 {
   # TODO: display flag name
-  packflags(flags);
-  bset(flags, imm8);
-  unpackflags(flags);
+  packflags(csw);
+  bset(csw, imm8);
+  unpackflags(csw);
 }
 
-#	{ 0x000032f4, 0x00003fff, T(ol0), N("bclr"), FLAGS, T(fl) },
-:bclr flags, "ie0" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & flags ; imm8=0x10 {
+#	{ 0x000032f4, 0x00003fff, T(ol0), N("bclr"), csw, T(fl) },
+:bclr csw, "ie0" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & csw ; imm8=0x10 {
   __clear_flag_ie0();
-  flags[0x10, 1] = 0;
+  csw[0x10, 1] = 0;
 }
-:bclr flags, "ie1" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & flags ; imm8=0x11 {
+:bclr csw, "ie1" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & csw ; imm8=0x11 {
   __clear_flag_ie1();
-  flags[0x11, 1] = 0;
+  csw[0x11, 1] = 0;
 }
 
-:bclr flags, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & flags ; imm8 {
+:bclr csw, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & csw ; imm8 {
   # TODO: display flag name
-  packflags(flags);
-  bclr(flags, imm8);
-  unpackflags(flags);
+  packflags(csw);
+  bclr(csw, imm8);
+  unpackflags(csw);
 }
 
-#	{ 0x000033f4, 0x00003fff, T(ol0), N("btgl"), FLAGS, T(fl) },
-:btgl flags, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x33 & flags ; imm8 {
+#	{ 0x000033f4, 0x00003fff, T(ol0), N("btgl"), csw, T(fl) },
+:btgl csw, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x33 & csw ; imm8 {
   # TODO: display flag name
-  packflags(flags);
-  btgl(flags, imm8);
-  unpackflags(flags);
+  packflags(csw);
+  btgl(csw, imm8);
+  unpackflags(csw);
 }
 
 #	{ 0x00003cf4, 0x00003fff, T(ol0), N("cxset"), IMM8, .fmask = F_CRYPT },
@@ -941,25 +691,25 @@
   todo(reg1);
 }
 
-#	{ 0x000009f9, 0x00000fff, OP2B, N("bset"), FLAGS, REG1 },
-:bset flags, reg1 is raw_opcode=0xf9; subopcode2=0x9 & reg1 & flags {
-  packflags(flags);
-  bset(flags, (reg1 & 0x1F));
-  unpackflags(flags);
+#	{ 0x000009f9, 0x00000fff, OP2B, N("bset"), csw, REG1 },
+:bset csw, reg1 is raw_opcode=0xf9; subopcode2=0x9 & reg1 & csw {
+  packflags(csw);
+  bset(csw, (reg1 & 0x1F));
+  unpackflags(csw);
 }
 
-#	{ 0x00000af9, 0x00000fff, OP2B, N("bclr"), FLAGS, REG1 },
-:bclr flags, reg1 is raw_opcode=0xf9; subopcode2=0xa & reg1 & flags {
-  packflags(flags);
-  bclr(flags, (reg1 & 0x1F));
-  unpackflags(flags);
+#	{ 0x00000af9, 0x00000fff, OP2B, N("bclr"), csw, REG1 },
+:bclr csw, reg1 is raw_opcode=0xf9; subopcode2=0xa & reg1 & csw {
+  packflags(csw);
+  bclr(csw, (reg1 & 0x1F));
+  unpackflags(csw);
 }
 
-#	{ 0x00000bf9, 0x00000fff, OP2B, N("btgl"), FLAGS, REG1 },
-:btgl flags, reg1 is raw_opcode=0xf9; subopcode2=0xb & reg1 & flags {
-  packflags(flags);
-  btgl(flags, (reg1 & 0x1F));
-  unpackflags(flags);
+#	{ 0x00000bf9, 0x00000fff, OP2B, N("btgl"), csw, REG1 },
+:btgl csw, reg1 is raw_opcode=0xf9; subopcode2=0xb & reg1 & csw {
+  packflags(csw);
+  btgl(csw, (reg1 & 0x1F));
+  unpackflags(csw);
 }
 
 #	{ 0x000000f9, 0x000000ff, OP2B, OOPS, REG1 },
@@ -991,10 +741,10 @@
 
 #	{ 0x000800fa, 0x000f00ff, OP3B, N("setp"), REG2, REG1 },
 :setp reg2, reg1 is raw_opcode=0xFA; reg2 & reg1; subopcode3=0x8 {
-  packflags(flags);
+  packflags(csw);
   local shift = reg1 & 0x1F;
-  flags = (flags & ~(1 << shift)) | ((reg2 & 1) << shift);
-  unpackflags(flags);
+  csw = (csw & ~(1 << shift)) | ((reg2 & 1) << shift);
+  unpackflags(csw);
 }
 
 #	{ 0x000000fa, 0x000000ff, OP3B, OOPS, REG1, REG2 },
@@ -1098,12 +848,12 @@
 #	{ 0x000000fe, 0x000f00ff, OP3B, N("mov"), SREG2, REG1 },
 :mov sreg2, reg1 is raw_opcode=0xfe; reg1 & sreg2; subopcode3=0x0 {
   sreg2 = reg1;
-  # TODO: unpack flags
+  # TODO: unpack csw
 }
 
 #	{ 0x000100fe, 0x000f00ff, OP3B, N("mov"), REG2, SREG1 },
 :mov reg2, sreg1 is raw_opcode=0xfe; sreg1 & reg2; subopcode3=0x1 {
-  # TODO: pack flags
+  # TODO: pack csw
   reg2 = sreg1;
 }
 
@@ -1117,11 +867,11 @@
   reg2 = vtlb(reg1);
 }
 
-#	{ 0x000c00fe, 0x000f00ff, OP3B, N("xbit"), REG2, FLAGS, REG1 },
-:xbit reg2, flags, reg1 is raw_opcode=0xfe; reg2 & reg1 & flags; subopcode3=0xc {
-  packflags(flags);
-  xbit(reg2, flags, reg1);
-  unpackflags(flags);
+#	{ 0x000c00fe, 0x000f00ff, OP3B, N("xbit"), REG2, csw, REG1 },
+:xbit reg2, csw, reg1 is raw_opcode=0xfe; reg2 & reg1 & csw; subopcode3=0xc {
+  packflags(csw);
+  xbit(reg2, csw, reg1);
+  unpackflags(csw);
 }
 
 #	{ 0x000000fe, 0x000000ff, OP3B, OOPS, REG2, REG1 },

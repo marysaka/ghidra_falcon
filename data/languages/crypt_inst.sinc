@@ -1,2 +1,153 @@
-# TODO: indirect crypt opcodes
-# TODO: crypt opcodes
+###############################################################
+##
+## Definitions of the SCP opcodes from the crypto extension.
+##
+###############################################################
+
+# Pseudocode operations for all crypto commands.
+define pcodeop Do_Nothing;
+define pcodeop Move_Data;
+define pcodeop Read_Stream;
+define pcodeop Write_Stream;
+define pcodeop Generate_Random;
+define pcodeop Record_Seq0;
+define pcodeop Execute_Seq0;
+define pcodeop Record_Seq1;
+define pcodeop Execute_Seq1;
+define pcodeop Modify_Acl;
+define pcodeop Xor_Data;
+define pcodeop Add_Data;
+define pcodeop And_Data;
+define pcodeop Reverse_Data;
+define pcodeop GF_Multiply;
+define pcodeop Load_Secret;
+define pcodeop Set_Keyreg;
+define pcodeop Expand_Key;
+define pcodeop Reverse_Expand_Key;
+define pcodeop Encrypt;
+define pcodeop Decrypt;
+define pcodeop Compare_Sig;
+define pcodeop Encrypt_Sig;
+define pcodeop Forget_Sig;
+
+# TODO: Is it possible to concatenate "c" + creg1/creg2 somehow for decompiler view?
+
+# Does nothing.
+:cnop is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x0 {
+  Do_Nothing();
+}
+
+# Moves a block into another crypto register.
+:cmov creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x1 & creg1 & creg2 {
+  Move_Data(creg1 :4, creg2 :4);
+}
+
+# Reads a block from the crypto stream.
+:cxsin creg1 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x2 & creg1 {
+  Read_Stream(creg1 :4);
+}
+
+# Writes a block to the crypto stream.
+:cxsout creg1 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x3 & creg1 {
+  Write_Stream(creg1 :4);
+}
+
+# Fills a crypto register with random data from the RNG controller.
+:crnd creg1 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x4 & creg1 {
+  Generate_Random(creg1 :4);
+}
+
+# Records a crypto script to be stored in slot 0 of the SEQ block of the SCP.
+:cs0begin cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x5 & cimm {
+  Record_Seq0(cimm :5);
+}
+
+# Executes the crypto script stored in slot 0 of the SEQ block of the SCP.
+:cs0exec cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x6 & cimm {
+  Execute_Seq0(cimm :5);
+}
+
+# Records a crypto script to be stored in slot 1 of the SEQ block of the SCP.
+:cs1begin cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x7 & cimm {
+  Record_Seq1(cimm :5);
+}
+
+# Executes the crypto script stored in slot 1 of the SEQ block of the SCP.
+:cs1exec cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x8 & cimm {
+  Execute_Seq1(cimm :5);
+}
+
+# Modifies the ACL value of a crypto register under special circumstances.
+:cchmod creg1, cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xA & creg1 & cimm {
+  Modify_Acl(creg1 :4, cimm :5);
+}
+
+# XORs a block with another block and stores the result.
+:cxor creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xB & creg1 & creg2 {
+  Xor_Data(creg1 :4, creg2 :4);
+}
+
+# Adds an immediate to a block, modulo 2^64.
+:cadd creg1, cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xC & creg1 & cimm {
+  Add_Data(creg1 :4, cimm :5);
+}
+
+# ANDs a block with another block and stores the result.
+:cand creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xD & creg1 & creg2 {
+  And_Data(creg1 :4, creg2 :4);
+}
+
+# Swaps the endianness of a block.
+:crev creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xE & creg1 & creg2 {
+  Reverse_Data(creg1 :4, creg2 :4);
+}
+
+# Performs a Galois field multiplication on the whole block: res=block << 1; if (block & 0x800....) res ^= 0x87;
+:cgfmul creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xF & creg1 & creg2 {
+  GF_Multiply(creg1 :4, creg2 :4);
+}
+
+# Loads a selected hardware secret into a crypto register.
+:csecret creg1, cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x10 & creg1 & cimm {
+  Load_Secret(creg1 :4, cimm :5);
+}
+
+# Binds a register as the key register whose contents should be used for enc/dec operations.
+:ckeyreg creg1 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x11 & creg1 {
+  Set_Keyreg(creg1 :4);
+}
+
+# Walks through the AES key schedule to generate the last round key.
+:ckexp creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x12 & creg1 & creg2 {
+  Expand_Key(creg1 :4, creg2 :4);
+}
+
+# Walks through the AES key schedule in reverse to get the original key.
+:ckrexp creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x13 & creg1 & creg2 {
+  Reverse_Expand_Key(creg1 :4, creg2 :4);
+}
+
+# Encrypts a block using the active key register and stores the ciphertext.
+:cenc creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x14 & creg1 & creg2 {
+  Encrypt(creg1 :4, creg2 :4);
+}
+
+# Decrypts a block using the active key register and stores the plaintext.
+:cdec creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x15 & creg1 & creg2 {
+  Decrypt(creg1 :4, creg2 :4);
+}
+
+# Compares two signatures and sets the auth signature for HS if they match.
+:csigcmp creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x16 & creg1 & creg2 {
+  Compare_Sig(creg1 :4, creg2 :4);
+}
+
+# Encrypts the auth signature of the running code and sets ACL 0x13.
+:csigenc creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x17 & creg1 & creg2 {
+  Encrypt_Sig(creg1 :4, creg2 :4);
+}
+
+# Clears the auth signature of the running HS code.
+:csigclr is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x18 {
+  Forget_Sig();
+}

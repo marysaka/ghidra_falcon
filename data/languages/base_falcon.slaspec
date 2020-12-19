@@ -38,26 +38,32 @@ define register offset=0x40 size=4 [
   exci sec1 imb1 dmb1
 ];
 
+# crypto registers
+define register offset=0x200 size=4 [  # XXX: dirty hack; crypto regs are 133 bits in size
+  c0 c1 c2 c3 c4 c5 c6 c7
+];
+
 # Flag bits from the CSW register.
-define bitrange p0=csw[0,1]
-                p1=csw[1,1]
-                p2=csw[2,1]
-                p3=csw[3,1]
-                p4=csw[4,1]
-                p5=csw[5,1]
-                p6=csw[6,1]
-                p7=csw[7,1]
-                cf=csw[8,1]
-                of=csw[9,1]
-                sf=csw[10,1]
-                zf=csw[11,1]
-                ie0=csw[16,1]
-                ie1=csw[17,1]
-                ie2=csw[18,1]
-                is0=csw[20,1]
-                is1=csw[21,1]
-                is2=csw[22,1]
-                ea=csw[24,1];
+# TODO: Use bitrange when supported.
+#define bitrange p0=csw[0,1]
+#                p1=csw[1,1]
+#                p2=csw[2,1]
+#                p3=csw[3,1]
+#                p4=csw[4,1]
+#                p5=csw[5,1]
+#                p6=csw[6,1]
+#                p7=csw[7,1]
+#                cf=csw[8,1]
+#                of=csw[9,1]
+#                sf=csw[10,1]
+#                zf=csw[11,1]
+#                ie0=csw[16,1]
+#                ie1=csw[17,1]
+#                ie2=csw[18,1]
+#                is0=csw[20,1]
+#                is1=csw[21,1]
+#                is2=csw[22,1]
+#                ea=csw[24,1];
 
 # unpacked flags
 define register offset=0x100 size=1 [
@@ -71,14 +77,14 @@ define register offset=0x100 size=1 [
 
 # TODO: define flags?
 
-@define P0_flag "flags[0, 1]"
-@define P1_flag "flags[1, 1]"
-@define P2_flag "flags[2, 1]"
-@define P3_flag "flags[3, 1]"
-@define P4_flag "flags[4, 1]"
-@define P5_flag "flags[5, 1]"
-@define P6_flag "flags[6, 1]"
-@define P7_flag "flags[7, 1]"
+@define P0_flag "csw[0, 1]"
+@define P1_flag "csw[1, 1]"
+@define P2_flag "csw[2, 1]"
+@define P3_flag "csw[3, 1]"
+@define P4_flag "csw[4, 1]"
+@define P5_flag "csw[5, 1]"
+@define P6_flag "csw[6, 1]"
+@define P7_flag "csw[7, 1]"
 @define C_flag "CF"
 @define O_flag "OF"
 @define S_flag "SF"
@@ -144,15 +150,17 @@ define token opcode_byte4 (8)
   #subopcode_crypt=(2, 7)
 ;
 
+# The crypto pair represents the last two bytes of a crypto command instruction.
+# It encodes data which are meant to be transferred to the SCP via an artificial
+# signal. This signal includes a crypto opcode, register notations and immediates,
+# depending on the specific command to be invoked.
 define token crypt_pair (16)
   creg1=(0, 2)
   creg2=(4, 6)
-  cimm2=(4, 9)
 
+  cimm=(4, 9)
 
-  cunk1=(0, 3)
-  cunk2=(4, 9)
-  subopcode_crypt=(10,15)
+  subopcode_crypt=(10,14)
 ;
 
 define token immediate8 (8)
@@ -185,15 +193,21 @@ define token opcode_immediate32 (32)
 
 attach variables [ reg0 reg1 reg2 reg3 ]
 [
-  r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15
+  r0  r1  r2  r3
+  r4  r5  r6  r7
+  r8  r9  r10 r11
+  r12 r13 r14 r15
 ];
 
 attach variables [ sreg1 sreg2 ]
 [
-  iv0 iv1 iv2 ev sp pc imb dmb csw ccr sec ctx exci sec1 imb1 dmb1
+  iv0  iv1  iv2  ev
+  sp   pc   imb  dmb
+  csw  ccr  sec  ctx
+  exci sec1 imb1 dmb1
 ];
 
-attach names [ creg1 creg2 ]
+attach variables [ creg1 creg2 ]
 [
   c0 c1 c2 c3 c4 c5 c6 c7
 ];
@@ -223,7 +237,6 @@ define pcodeop todo_flags;
 @include "fuc5_inst.sinc"
 @endif
 
-
 @if defined(CRYPT_EXTENSION)
 @include "crypt_inst.sinc"
 @endif
@@ -233,37 +246,3 @@ define pcodeop todo_flags;
 
 
 @include "sized.sinc"
-
-
-# constructor start
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
