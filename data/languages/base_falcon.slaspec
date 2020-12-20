@@ -38,10 +38,12 @@ define register offset=0x40 size=4 [
   exci sec1 imb1 dmb1
 ];
 
+@if defined(CRYPT_EXTENSION)
 # crypto registers
 define register offset=0x200 size=4 [  # XXX: dirty hack; crypto regs are 133 bits in size
   c0 c1 c2 c3 c4 c5 c6 c7
 ];
+@endif
 
 # Flag bits from the CSW register.
 # TODO: Use bitrange when supported.
@@ -150,6 +152,7 @@ define token opcode_byte4 (8)
   #subopcode_crypt=(2, 7)
 ;
 
+@if defined(CRYPT_EXTENSION)
 # The crypto pair represents the last two bytes of a crypto command instruction.
 # It encodes data which are meant to be transferred to the SCP via an artificial
 # signal. This signal includes a crypto opcode, register notations and immediates,
@@ -162,6 +165,7 @@ define token crypt_pair (16)
 
   subopcode_crypt=(10,14)
 ;
+@endif
 
 define token immediate8 (8)
   imm8=(0, 7)
@@ -207,10 +211,12 @@ attach variables [ sreg1 sreg2 ]
   exci sec1 imb1 dmb1
 ];
 
+@if defined(CRYPT_EXTENSION)
 attach variables [ creg1 creg2 ]
 [
   c0 c1 c2 c3 c4 c5 c6 c7
 ];
+@endif
 
 rel8: target is imm8s [ target = inst_start + imm8s; ] {
   export *:4 target;
