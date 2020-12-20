@@ -5,8 +5,19 @@
 <processor_spec>
   <programcounter register="pc"/>
 
+  <data_space space="dmem"/>
+
   <volatile outputop="reg_write" inputop="reg_read">
     <range space="register" first="0x58" last="0x5f"/> <!-- xcbase xdbase -->
     <range space="register" first="0x64" last="0xff"/>
   </volatile>
+
+  <!--<default_symbols>
+
+  </default_symbols>-->
+
+  <!--<default_memory_blocks>
+    <memory_block name="iospace" start_address="io:0x00" length="0xB804" initialized="false"/>
+    <memory_block name="mem" start_address="dmem:0x00" length="0x4000" initialized="false"/>
+  </default_memory_blocks>-->
 </processor_spec>

@@ -3,9 +3,9 @@
 define endian=little;
 define alignment=1;
 
-define space ram type=ram_space size=4 default;
-define space dram type=ram_space size=4;
-define space register type=register_space size=4;
+define space imem       type=ram_space      size=4 default;
+define space dmem       type=ram_space      size=4;
+define space register   type=register_space size=4;
 
 # general-purpose registers
 define register offset=0 size=4 [
@@ -75,8 +75,6 @@ define register offset=0x100 size=1 [
   ZF # bit 11
 ];
 
-
-
 # TODO: define flags?
 
 @define P0_flag "csw[0, 1]"
@@ -106,7 +104,6 @@ macro packflags(tmp) {
     | (0x400 * zext(SF & 1))
     | (0x800 * zext(ZF & 1));
 }
-
 
 
 # 8 bits format & size of opcode
@@ -143,7 +140,6 @@ define token opcode_byte2 (8)
 
   subopcode_crypti=(0,4)
 ;
-
 
 define token opcode_byte4 (8)
   subopcode5=(0, 3)
@@ -219,20 +215,21 @@ attach variables [ creg1 creg2 ]
 @endif
 
 rel8: target is imm8s [ target = inst_start + imm8s; ] {
-  export *:4 target;
+  export *[imem]:4 target;
 }
 
 rel16: target is imm16s [ target = inst_start + imm16s; ] {
-  export *:4 target;
+  export *[imem]:4 target;
 }
 
 addr16: imm16 is imm16 {
-  export *:4 imm16;
+  export *[imem]:4 imm16;
 }
 
 fimm24st: target is fimm24s [ target = 0 + fimm24s; ] {
-  export *:4 target;
+  export *[imem]:4 target;
 }
+
 define pcodeop todo;
 define pcodeop todo_flags;
 
@@ -247,8 +244,6 @@ define pcodeop todo_flags;
 @include "crypt_inst.sinc"
 @endif
 
-
 @include "envydis.sinc"
-
 
 @include "sized.sinc"

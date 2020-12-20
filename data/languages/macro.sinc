@@ -3,22 +3,22 @@ macro todo_binop(dst, src1, src2) {
 }
 
 macro store32(addr, value) {
-  *[dram]:4 (addr) = value;
+  *[dmem]:4 (addr) = value;
 }
 macro store16(addr, value) {
-  *[dram]:2 (addr) = value;
+  *[dmem]:2 (addr) = value;
 }
 macro store8(addr, value) {
-  *[dram]:1 (addr) = value;
+  *[dmem]:1 (addr) = value;
 }
 macro load32(dst1, addr) {
-  dst1 = *[dram]:4 (addr);
+  dst1 = *[dmem]:4 (addr);
 }
 macro load16(dst1, addr) {
-  dst1 = *[dram]:2 (addr);
+  dst1 = *[dmem]:2 (addr);
 }
 macro load8(dst1, addr) {
-  dst1 = *[dram]:1 (addr);
+  dst1 = *[dmem]:1 (addr);
 }
 
 macro xbit(dst1, src1, bit1) {
@@ -44,12 +44,12 @@ macro btgl(reg1, bit1) {
 
 macro push32(val32) {
   sp = sp - 4;
-  *[dram]:4 sp = val32;
+  *[dmem]:4 sp = val32;
 }
 
 macro pop32(ret32) {
   sp = sp + 4;
-  ret32 = *[dram]:4 sp;
+  ret32 = *[dmem]:4 sp;
 }
 
 macro ret() {

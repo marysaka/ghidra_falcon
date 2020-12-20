@@ -30,8 +30,6 @@ define pcodeop Compare_Sig;
 define pcodeop Encrypt_Sig;
 define pcodeop Forget_Sig;
 
-# TODO: Is it possible to concatenate "c" + creg1/creg2 somehow for decompiler view?
-
 # Does nothing.
 :cnop is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x0 {
   Do_Nothing();

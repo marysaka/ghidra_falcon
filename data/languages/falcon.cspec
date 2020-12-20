@@ -10,11 +10,14 @@
     <default_pointer_alignment value="4" />
     <pointer_size value="4" />
   </data_organization>
+
   <global>
-    <range space="ram"/>
-    <range space="dram"/>
+    <range space="imem"/>
+    <range space="dmem"/>
   </global>
-  <stackpointer register="sp" space="dram"/>
+
+  <stackpointer register="sp" space="dmem" growth="negative"/>
+
   <returnaddress>
     <varnode space="stack" offset="0" size="4"/>
   </returnaddress>
