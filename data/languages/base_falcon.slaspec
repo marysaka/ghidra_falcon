@@ -222,6 +222,10 @@ rel16: target is imm16s [ target = inst_start + imm16s; ] {
   export *[imem]:4 target;
 }
 
+addr8: imm8 is imm8 {
+  export *[imem]:4 imm8;
+}
+
 addr16: imm16 is imm16 {
   export *[imem]:4 imm16;
 }

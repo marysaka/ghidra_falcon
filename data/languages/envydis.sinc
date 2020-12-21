@@ -538,6 +538,11 @@
 }
 
 #	{ 0x000021f4, 0x00003fff, T(ol0), N("call"), T(ct) },
+:call addr8 is raw_opcode=0xf4; subopcodeb1_0_7=0x21; addr8 {
+  push32(&:4 inst_next);
+  call addr8;
+}
+
 #	{ 0x000021f5, 0x00003fff, T(ol0), N("call"), T(ct), .fmask = F_FUCOLD },
 @if defined(SUPPORT_FUCOLD)
 :call addr16 is raw_opcode=0xf5; subopcodeb1_0_7=0x21; addr16 {
