@@ -19,6 +19,7 @@ define pcodeop xdwait;
 
 define pcodeop __clear_flag_ie0;
 define pcodeop __clear_flag_ie1;
+define pcodeop __clear_flag_ie2;
 define pcodeop __clear_flag_is0;
 define pcodeop __clear_flag_is1;
 define pcodeop __clear_flag_ta;

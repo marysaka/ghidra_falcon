@@ -590,6 +590,10 @@
   __clear_flag_ie1();
   csw[0x11, 1] = 0;
 }
+:bclr csw, "ie2" is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & csw ; imm8=0x12 {
+  __clear_flag_ie2();
+  csw[0x12, 1] = 0;
+}
 
 :bclr csw, imm8 is raw_opcode=0xf4 ; subopcodeb1_0_7=0x32 & csw ; imm8 {
   # TODO: display flag name
