@@ -149,3 +149,113 @@ define pcodeop Forget_Sig;
 :csigclr is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x18 {
   Forget_Sig();
 }
+
+#	/* The indirect crypt opcodes.
+#	 *
+#	 * For one-reg opcodes, the crypt register to use is selected by
+#	 * bits 8-10 of the operand. For two-reg opcodes, destination is in
+#	 * bits 8-10, source in 0-2. For reg, imm opcodes, reg is in
+#	 * bits 8-10, immediate in 0-5. For imm-only opcodes, immediate is in
+#	 * bits 0-5.
+#	 *
+#	 * Or, in other words, the insn is converted into f5/3c op as follows:
+#	 *
+#	 *  bits 0-3: bits 8-11 of reg operand
+#	 *  bits 4-9: bits 0-5 of reg operand
+#	 *  bits 10-14: bits 0-4 of immediate byte
+#	 *  bit 15: always set.
+#	 */
+#	{ 0x00010cf2, 0x001f0fff, OP3B, N("cimov"), REG1, .fmask = F_CRYPT },
+:cimov reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x01 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00020cf2, 0x001f0fff, OP3B, N("cixsin"), REG1, .fmask = F_CRYPT },
+:cixsin reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x02 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00030cf2, 0x001f0fff, OP3B, N("cixsout"), REG1, .fmask = F_CRYPT },
+:cixsout reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x03 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00050cf2, 0x001f0fff, OP3B, N("cis0begin"), REG1, .fmask = F_CRYPT },
+:cis0begin reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x05 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00060cf2, 0x001f0fff, OP3B, N("cis0exec"), REG1, .fmask = F_CRYPT },
+:cis0exec reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x06 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00070cf2, 0x001f0fff, OP3B, N("cis1begin"), REG1, .fmask = F_CRYPT },
+:cis1begin reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x07 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00080cf2, 0x001f0fff, OP3B, N("cis1exec"), REG1, .fmask = F_CRYPT },
+:cis1exec reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x08 {
+  todo(reg1 :4);
+}
+
+#	{ 0x000b0cf2, 0x001f0fff, OP3B, N("cixor"), REG1, .fmask = F_CRYPT },
+:cixor reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0b {
+  todo(reg1 :4);
+}
+
+#	{ 0x000c0cf2, 0x001f0fff, OP3B, N("ciadd"), REG1, .fmask = F_CRYPT },
+:ciadd reg1 is raw_opcode=0xf2; subopcode2=0xC & reg1; subopcode_crypti=0x0c {
+  todo(reg1 :4);
+}
+
+#	{ 0x000d0cf2, 0x001f0fff, OP3B, N("ciand"), REG1, .fmask = F_CRYPT },
+:ciand reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0d {
+  todo(reg1 :4);
+}
+
+#	{ 0x000e0cf2, 0x001f0fff, OP3B, N("cirev"), REG1, .fmask = F_CRYPT },
+:cirev reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0e {
+  todo(reg1 :4);
+}
+
+#	{ 0x000f0cf2, 0x001f0fff, OP3B, N("ciprecmac"), REG1, .fmask = F_CRYPT },
+:ciprecmac reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0f {
+  todo(reg1 :4);
+}
+
+#	{ 0x00100cf2, 0x001f0fff, OP3B, N("cisecret"), REG1, .fmask = F_CRYPT },
+:cisecret reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x10 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00110cf2, 0x001f0fff, OP3B, N("cikeyreg"), REG1, .fmask = F_CRYPT },
+:cikeyreg reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x11 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00120cf2, 0x001f0fff, OP3B, N("cikexp"), REG1, .fmask = F_CRYPT },
+:cikexp reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x12 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00130cf2, 0x001f0fff, OP3B, N("cikrexp"), REG1, .fmask = F_CRYPT },
+:cikrexp reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x13 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00140cf2, 0x001f0fff, OP3B, N("cienc"), REG1, .fmask = F_CRYPT },
+:cienc reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x14 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00150cf2, 0x001f0fff, OP3B, N("cidec"), REG1, .fmask = F_CRYPT },
+:cidec reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x15 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00170cf2, 0x001f0fff, OP3B, N("cisigenc"), REG1, .fmask = F_CRYPT },
+:cisigenc reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x17 {
+  todo(reg1 :4);
+}
