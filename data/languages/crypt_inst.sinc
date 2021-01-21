@@ -1,2 +1,261 @@
-# TODO: indirect crypt opcodes
-# TODO: crypt opcodes
+###############################################################
+##
+## Definitions of the SCP opcodes from the crypto extension.
+##
+###############################################################
+
+# Pseudocode operations for all crypto commands.
+define pcodeop Do_Nothing;
+define pcodeop Move_Data;
+define pcodeop Read_Stream;
+define pcodeop Write_Stream;
+define pcodeop Generate_Random;
+define pcodeop Record_Seq0;
+define pcodeop Execute_Seq0;
+define pcodeop Record_Seq1;
+define pcodeop Execute_Seq1;
+define pcodeop Modify_Acl;
+define pcodeop Xor_Data;
+define pcodeop Add_Data;
+define pcodeop And_Data;
+define pcodeop Reverse_Data;
+define pcodeop GF_Multiply;
+define pcodeop Load_Secret;
+define pcodeop Set_Keyreg;
+define pcodeop Expand_Key;
+define pcodeop Reverse_Expand_Key;
+define pcodeop Encrypt;
+define pcodeop Decrypt;
+define pcodeop Compare_Sig;
+define pcodeop Encrypt_Sig;
+define pcodeop Forget_Sig;
+
+# Does nothing.
+:cnop is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x0 {
+  Do_Nothing();
+}
+
+# Moves a block into another crypto register.
+:cmov creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x1 & creg1 & creg2 {
+  Move_Data(creg1 :4, creg2 :4);
+}
+
+# Reads a block from the crypto stream.
+:cxsin creg1 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x2 & creg1 {
+  Read_Stream(creg1 :4);
+}
+
+# Writes a block to the crypto stream.
+:cxsout creg1 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x3 & creg1 {
+  Write_Stream(creg1 :4);
+}
+
+# Fills a crypto register with random data from the RNG controller.
+:crnd creg1 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x4 & creg1 {
+  Generate_Random(creg1 :4);
+}
+
+# Records a crypto script to be stored in slot 0 of the SEQ block of the SCP.
+:cs0begin cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x5 & cimm {
+  Record_Seq0(cimm :5);
+}
+
+# Executes the crypto script stored in slot 0 of the SEQ block of the SCP.
+:cs0exec cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x6 & cimm {
+  Execute_Seq0(cimm :5);
+}
+
+# Records a crypto script to be stored in slot 1 of the SEQ block of the SCP.
+:cs1begin cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x7 & cimm {
+  Record_Seq1(cimm :5);
+}
+
+# Executes the crypto script stored in slot 1 of the SEQ block of the SCP.
+:cs1exec cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x8 & cimm {
+  Execute_Seq1(cimm :5);
+}
+
+# Modifies the ACL value of a crypto register under special circumstances.
+:cchmod creg1, cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xA & creg1 & cimm {
+  Modify_Acl(creg1 :4, cimm :5);
+}
+
+# XORs a block with another block and stores the result.
+:cxor creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xB & creg1 & creg2 {
+  Xor_Data(creg1 :4, creg2 :4);
+}
+
+# Adds an immediate to a block, modulo 2^64.
+:cadd creg1, cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xC & creg1 & cimm {
+  Add_Data(creg1 :4, cimm :5);
+}
+
+# ANDs a block with another block and stores the result.
+:cand creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xD & creg1 & creg2 {
+  And_Data(creg1 :4, creg2 :4);
+}
+
+# Swaps the endianness of a block.
+:crev creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xE & creg1 & creg2 {
+  Reverse_Data(creg1 :4, creg2 :4);
+}
+
+# Performs a Galois field multiplication on the whole block: res=block << 1; if (block & 0x800....) res ^= 0x87;
+:cgfmul creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0xF & creg1 & creg2 {
+  GF_Multiply(creg1 :4, creg2 :4);
+}
+
+# Loads a selected hardware secret into a crypto register.
+:csecret creg1, cimm is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x10 & creg1 & cimm {
+  Load_Secret(creg1 :4, cimm :5);
+}
+
+# Binds a register as the key register whose contents should be used for enc/dec operations.
+:ckeyreg creg1 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x11 & creg1 {
+  Set_Keyreg(creg1 :4);
+}
+
+# Walks through the AES key schedule to generate the last round key.
+:ckexp creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x12 & creg1 & creg2 {
+  Expand_Key(creg1 :4, creg2 :4);
+}
+
+# Walks through the AES key schedule in reverse to get the original key.
+:ckrexp creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x13 & creg1 & creg2 {
+  Reverse_Expand_Key(creg1 :4, creg2 :4);
+}
+
+# Encrypts a block using the active key register and stores the ciphertext.
+:cenc creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x14 & creg1 & creg2 {
+  Encrypt(creg1 :4, creg2 :4);
+}
+
+# Decrypts a block using the active key register and stores the plaintext.
+:cdec creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x15 & creg1 & creg2 {
+  Decrypt(creg1 :4, creg2 :4);
+}
+
+# Compares two signatures and sets the auth signature for HS if they match.
+:csigcmp creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x16 & creg1 & creg2 {
+  Compare_Sig(creg1 :4, creg2 :4);
+}
+
+# Encrypts the auth signature of the running code and sets ACL 0x13.
+:csigenc creg1, creg2 is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x17 & creg1 & creg2 {
+  Encrypt_Sig(creg1 :4, creg2 :4);
+}
+
+# Clears the auth signature of the running HS code.
+:csigclr is raw_opcode=0xF5; subopcodeb1_0_7=0x3C; subopcode_crypt=0x18 {
+  Forget_Sig();
+}
+
+#	/* The indirect crypt opcodes.
+#	 *
+#	 * For one-reg opcodes, the crypt register to use is selected by
+#	 * bits 8-10 of the operand. For two-reg opcodes, destination is in
+#	 * bits 8-10, source in 0-2. For reg, imm opcodes, reg is in
+#	 * bits 8-10, immediate in 0-5. For imm-only opcodes, immediate is in
+#	 * bits 0-5.
+#	 *
+#	 * Or, in other words, the insn is converted into f5/3c op as follows:
+#	 *
+#	 *  bits 0-3: bits 8-11 of reg operand
+#	 *  bits 4-9: bits 0-5 of reg operand
+#	 *  bits 10-14: bits 0-4 of immediate byte
+#	 *  bit 15: always set.
+#	 */
+#	{ 0x00010cf2, 0x001f0fff, OP3B, N("cimov"), REG1, .fmask = F_CRYPT },
+:cimov reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x01 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00020cf2, 0x001f0fff, OP3B, N("cixsin"), REG1, .fmask = F_CRYPT },
+:cixsin reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x02 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00030cf2, 0x001f0fff, OP3B, N("cixsout"), REG1, .fmask = F_CRYPT },
+:cixsout reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x03 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00050cf2, 0x001f0fff, OP3B, N("cis0begin"), REG1, .fmask = F_CRYPT },
+:cis0begin reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x05 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00060cf2, 0x001f0fff, OP3B, N("cis0exec"), REG1, .fmask = F_CRYPT },
+:cis0exec reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x06 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00070cf2, 0x001f0fff, OP3B, N("cis1begin"), REG1, .fmask = F_CRYPT },
+:cis1begin reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x07 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00080cf2, 0x001f0fff, OP3B, N("cis1exec"), REG1, .fmask = F_CRYPT },
+:cis1exec reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x08 {
+  todo(reg1 :4);
+}
+
+#	{ 0x000b0cf2, 0x001f0fff, OP3B, N("cixor"), REG1, .fmask = F_CRYPT },
+:cixor reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0b {
+  todo(reg1 :4);
+}
+
+#	{ 0x000c0cf2, 0x001f0fff, OP3B, N("ciadd"), REG1, .fmask = F_CRYPT },
+:ciadd reg1 is raw_opcode=0xf2; subopcode2=0xC & reg1; subopcode_crypti=0x0c {
+  todo(reg1 :4);
+}
+
+#	{ 0x000d0cf2, 0x001f0fff, OP3B, N("ciand"), REG1, .fmask = F_CRYPT },
+:ciand reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0d {
+  todo(reg1 :4);
+}
+
+#	{ 0x000e0cf2, 0x001f0fff, OP3B, N("cirev"), REG1, .fmask = F_CRYPT },
+:cirev reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0e {
+  todo(reg1 :4);
+}
+
+#	{ 0x000f0cf2, 0x001f0fff, OP3B, N("ciprecmac"), REG1, .fmask = F_CRYPT },
+:ciprecmac reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x0f {
+  todo(reg1 :4);
+}
+
+#	{ 0x00100cf2, 0x001f0fff, OP3B, N("cisecret"), REG1, .fmask = F_CRYPT },
+:cisecret reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x10 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00110cf2, 0x001f0fff, OP3B, N("cikeyreg"), REG1, .fmask = F_CRYPT },
+:cikeyreg reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x11 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00120cf2, 0x001f0fff, OP3B, N("cikexp"), REG1, .fmask = F_CRYPT },
+:cikexp reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x12 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00130cf2, 0x001f0fff, OP3B, N("cikrexp"), REG1, .fmask = F_CRYPT },
+:cikrexp reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x13 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00140cf2, 0x001f0fff, OP3B, N("cienc"), REG1, .fmask = F_CRYPT },
+:cienc reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x14 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00150cf2, 0x001f0fff, OP3B, N("cidec"), REG1, .fmask = F_CRYPT },
+:cidec reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x15 {
+  todo(reg1 :4);
+}
+
+#	{ 0x00170cf2, 0x001f0fff, OP3B, N("cisigenc"), REG1, .fmask = F_CRYPT },
+:cisigenc reg1 is raw_opcode=0xf2; subopcode2=0xc & reg1; subopcode_crypti=0x17 {
+  todo(reg1 :4);
+}

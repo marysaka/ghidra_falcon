@@ -5,8 +5,10 @@
 <processor_spec>
   <programcounter register="pc"/>
 
+  <data_space space="dmem"/>
+
   <volatile outputop="reg_write" inputop="reg_read">
-    <range space="register" first="0x58" last="0x5f"/> <!-- xcbase xdbase -->
+    <range space="register" first="0x58" last="0x5f"/> <!-- imb dmb -->
     <range space="register" first="0x64" last="0xff"/>
   </volatile>
 </processor_spec>
