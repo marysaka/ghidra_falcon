@@ -8,10 +8,13 @@ import ghidra.app.util.bin.BinaryReader;
 import ghidra.app.util.bin.ByteProvider;
 import ghidra.app.util.importer.MessageLog;
 import ghidra.app.util.opinion.AbstractProgramLoader;
+import ghidra.app.util.opinion.Loaded;
+import ghidra.app.util.opinion.LoadException;
 import ghidra.app.util.opinion.LoadSpec;
 import ghidra.app.util.opinion.LoaderTier;
 import ghidra.framework.model.DomainFolder;
 import ghidra.framework.model.DomainObject;
+import ghidra.framework.model.Project;
 import ghidra.framework.store.LockException;
 import ghidra.program.flatapi.FlatProgramAPI;
 import ghidra.program.model.address.Address;
@@ -92,9 +95,10 @@ public class NvidiaGRBootloaderLoader extends AbstractProgramLoader {
 	}
 
 	@Override
-	protected List<Program> loadProgram(ByteProvider provider, String programName, DomainFolder programFolder,
-			LoadSpec loadSpec, List<Option> options, MessageLog log, Object consumer, TaskMonitor monitor)
-			throws IOException, CancelledException {
+	protected List<Loaded<Program>> loadProgram(ByteProvider provider, String programName,
+			Project project, String projectFolderPath, LoadSpec loadSpec, List<Option> options,
+			MessageLog log, Object consumer, TaskMonitor monitor)
+			throws IOException, LoadException, CancelledException {
 
 		LanguageCompilerSpecPair pair = loadSpec.getLanguageCompilerSpec();
 		Language importerLanguage = getLanguageService().getLanguage(pair.languageID);
@@ -105,27 +109,26 @@ public class NvidiaGRBootloaderLoader extends AbstractProgramLoader {
 				consumer);
 		boolean success = false;
 
+		List<Loaded<Program>> loadedList = List.of(new Loaded<>(prog, programName, projectFolderPath));
+
 		try {
-			success = this.loadInto(provider, loadSpec, options, log, prog, monitor);
+			loadInto(provider, loadSpec, options, log, prog, monitor);
+			success = true;
+
+			return loadedList;
 		} finally {
 			if (!success) {
 				prog.release(consumer);
-				prog = null;
 			}
 		}
-
-		List<Program> results = new ArrayList<Program>();
-		if (prog != null)
-			results.add(prog);
-		return results;
 	}
 
 	@Override
-	protected boolean loadProgramInto(ByteProvider provider, LoadSpec loadSpec, List<Option> options,
-			MessageLog messageLog, Program program, TaskMonitor monitor) throws IOException, CancelledException {
+	protected void loadProgramInto(ByteProvider provider, LoadSpec loadSpec,
+			List<Option> options, MessageLog log, Program program, TaskMonitor monitor) throws IOException, LoadException, CancelledException {
 		BinaryReader reader = new BinaryReader(provider, true);
 
-		FlatProgramAPI api = new FlatProgramAPI(program, monitor);
+		FlatProgramAPI api = new FlatProgramAPI(program);
 
 		long startOffset = reader.readUnsignedInt(0x0);
 		long size = reader.readUnsignedInt(0x4);
@@ -138,9 +141,7 @@ public class NvidiaGRBootloaderLoader extends AbstractProgramLoader {
 		try {
 			program.setImageBase(instructionMemoryAddress, true);
 		} catch (AddressOverflowException | LockException | IllegalStateException | AddressOutOfBoundsException e) {
-			Msg.error(this, "Failed to set image base", e);
-
-			return false;
+			throw new LoadException("Failed to set image base");
 		}
 
 		byte[] data = provider.readBytes(startOffset + 0x10, size);
@@ -149,15 +150,11 @@ public class NvidiaGRBootloaderLoader extends AbstractProgramLoader {
 			MemoryBlock block = api.createMemoryBlock("bootloader", instructionMemoryAddress, data, false);
 			block.setPermissions(true, false, true);
 		} catch (Exception e) {
-			Msg.error(this, "Failed to load image", e);
-
-			return false;
+			throw new LoadException("Failed to load image");
 		}
 
 		api.addEntryPoint(entrypointAddress);
 		api.disassemble(entrypointAddress);
 		api.createFunction(entrypointAddress, "_bootloader_entrypoint");
-
-		return true;
 	}
 }
