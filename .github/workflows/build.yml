@@ -34,7 +34,7 @@ jobs:
           version: ${{ matrix.ghidra }}
 
       - name: Build extension
-        run: gradle -PGHIDRA_INSTALL_DIR=${{ env.GHIDRA_INSTALL_DIR }}
+        run: ./gradlew -PGHIDRA_INSTALL_DIR=${{ env.GHIDRA_INSTALL_DIR }}
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
