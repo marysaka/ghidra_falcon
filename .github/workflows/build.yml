@@ -77,7 +77,7 @@ jobs:
       with:
         tag_name: "latest"
         prerelease: true
-        title: "Ghidra Falcon Nightly (${{steps.date.outputs.date}})"
+        name: "Ghidra Falcon Nightly (${{steps.date.outputs.date}})"
         files: Falcon*/*.zip
         fail_on_unmatched_files: true
 
@@ -86,6 +86,6 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         prerelease: false
-        title: "Ghidra Falcon ${{github.ref_name}}"
+        name: "Ghidra Falcon ${{github.ref_name}}"
         files: Falcon*/*.zip
         fail_on_unmatched_files: true
