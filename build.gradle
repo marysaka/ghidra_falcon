@@ -22,7 +22,7 @@ def DISTRIBUTION_DIR = file("dist")
 def PATH_IN_ZIP = "${project.name}"
 
 archivesBaseName="Falcon"
-version = 1.0
+version = 1.1
 
 task sleighCompile(type: JavaExec) {
     main = "ghidra.pcodeCPort.slgh_compile.SleighCompile"
