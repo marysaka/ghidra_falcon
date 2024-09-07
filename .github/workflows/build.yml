@@ -68,7 +68,7 @@ jobs:
       if: github.ref == 'refs/heads/master'
       run: |
         git fetch --tags
-        hub release delete latest
+        gh release delete latest -y || true
         git push --delete origin latest
 
     - name: Release nightly
