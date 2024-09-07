@@ -60,6 +60,10 @@ jobs:
     - name: Download binaries
       uses: actions/download-artifact@v4
 
+    - name: Checkout source for nightly release removal
+      uses: actions/checkout@v4
+      if: github.ref == 'refs/heads/master'
+
     - name: Remove previous nightly release
       if: github.ref == 'refs/heads/master'
       run: |
