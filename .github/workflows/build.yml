@@ -31,9 +31,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - uses: gradle/gradle-build-action@v2.11.1
+      - uses: gradle/actions/setup-gradle@v3
 
-      - uses: antoniovazquezblanco/setup-ghidra@v1.2.0
+      - uses: antoniovazquezblanco/setup-ghidra@v2.0.5
         with:
           auth_token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ matrix.ghidra }}
@@ -60,21 +60,28 @@ jobs:
     - name: Download binaries
       uses: actions/download-artifact@v4
 
+    - name: Remove previous nightly release
+      if: github.ref == 'refs/heads/master'
+      run: |
+        git fetch --tags
+        hub release delete latest
+        git push --delete origin latest
+
     - name: Release nightly
       if: github.ref == 'refs/heads/master'
-      uses: marvinpinto/action-automatic-releases@v1.2.1
+      uses: softprops/action-gh-release@v2
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
+        tag_name: "latest"
         prerelease: true
         title: "Ghidra Falcon Nightly (${{steps.date.outputs.date}})"
         files: Falcon*/*.zip
+        fail_on_unmatched_files: true
 
     - name: Release stable
       if: contains(github.ref, 'refs/tags/v')
-      uses: marvinpinto/action-automatic-releases@v1.2.1
+      uses: softprops/action-gh-release@v2
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
         title: "Ghidra Falcon ${{github.ref_name}}"
         files: Falcon*/*.zip
+        fail_on_unmatched_files: true
